@@ -94,10 +94,35 @@ h1{margin-top:12px}
 @media(max-width:420px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.grid>.card{padding:13px}.grid>.card .stat{font-size:24px}.grid>.card button{padding:9px;font-size:12px;min-height:38px}.card{padding:17px}h1{font-size:28px}.tabs button{font-size:10px}}
 @media(prefers-reduced-motion:reduce){.view{animation:none}*{scroll-behavior:auto}}
 
+
+/* FITTRACK Liquid Glass dark theme */
+body.theme-dark{color-scheme:dark;--bg:#080f1e;--panel:rgba(24,36,59,.58);--panel2:rgba(46,65,95,.45);--line:rgba(199,220,255,.14);--muted:#a8b5cb;--white:#f1f6ff;--accent:#79b8ff;background:radial-gradient(ellipse 80% 48% at 6% 0%,rgba(36,100,201,.34),transparent 80%),radial-gradient(ellipse 60% 40% at 95% 55%,rgba(106,72,183,.17),transparent 75%),linear-gradient(160deg,#0a1427,#070d19 75%);background-attachment:fixed}
+.theme-dark header{background:rgba(14,24,43,.56);border-color:rgba(213,231,255,.12);box-shadow:0 4px 30px rgba(0,0,0,.08);backdrop-filter:blur(30px) saturate(180%);-webkit-backdrop-filter:blur(30px) saturate(180%)}
+.theme-dark .logo{color:#f2f6ff}.theme-dark .logo span{color:#8bc5ff}.theme-dark .date{color:#9baac1}
+.theme-dark h1,.theme-dark h2,.theme-dark h3{color:#f2f6ff}
+.theme-dark .sub,.theme-dark .notice{color:#a6b5cc}
+.theme-dark .card{background:linear-gradient(140deg,rgba(51,74,113,.47),rgba(18,29,49,.48));border:1px solid rgba(218,235,255,.17);box-shadow:inset 0 1px 0 rgba(255,255,255,.11),0 15px 35px rgba(0,0,0,.17);backdrop-filter:blur(28px) saturate(160%);-webkit-backdrop-filter:blur(28px) saturate(160%)}
+.theme-dark .stat{color:#f1f6ff}.theme-dark .accent{color:#9bcbff}
+.theme-dark .pill,.theme-dark header>.pill{background:rgba(94,156,255,.18);color:#a7d2ff;border:1px solid rgba(143,195,255,.23)}
+.theme-dark button:not(.secondary):not(.ghost):not(.theme-switch):not(.tabs button){background:linear-gradient(135deg,#398ef4,#2766c7);color:#fff;box-shadow:0 5px 18px rgba(37,110,226,.22)}
+.theme-dark button.secondary{background:rgba(119,167,230,.15);color:#c7e1ff;border:1px solid rgba(179,214,255,.17)}
+.theme-dark button.ghost{background:rgba(255,255,255,.045);color:#b4c1d6;border:1px solid rgba(200,224,255,.13)}
+.theme-dark input,.theme-dark select{background:rgba(8,17,32,.48);color:#eef5ff;border:1px solid rgba(199,221,255,.2)}
+.theme-dark input::placeholder{color:#8092ac}.theme-dark label{color:#b1bfd3}
+.theme-dark .progress{background:rgba(204,224,255,.14)}.theme-dark .progress i{background:linear-gradient(90deg,#58a6ff,#a5d8ff)}
+.theme-dark .habit,.theme-dark .exercise,.theme-dark td,.theme-dark th{border-color:rgba(212,231,255,.12)}
+.theme-dark .exercise small,.theme-dark th{color:#9eafc8}
+.theme-dark .tabs{background:rgba(22,36,60,.66);border:1px solid rgba(212,231,255,.19);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 12px 38px rgba(0,0,0,.35);backdrop-filter:blur(32px) saturate(190%);-webkit-backdrop-filter:blur(32px) saturate(190%)}
+.theme-dark .tabs button{color:#9baec9}.theme-dark .tabs button.active{background:rgba(105,166,255,.21);color:#c1e1ff}
+.theme-switch{background:rgba(135,166,209,.14);color:inherit;border:1px solid rgba(160,189,225,.24);border-radius:999px;min-height:36px;padding:7px 12px;font-size:13px;box-shadow:none;white-space:nowrap}
+.theme-dark .theme-switch{background:rgba(190,216,255,.12);color:#e5f1ff;border-color:rgba(214,233,255,.2)}
+.header-actions{display:flex;align-items:center;gap:8px}
+@media(max-width:390px){.header-actions>.pill{display:none}.theme-switch{font-size:12px;padding:7px 10px}}
+
 </style>
 </head>
 <body>
-<header><div><div class="logo">FIT<span>TRACK</span></div><div class="date" id="today"></div></div><div class="pill">PERSONAL OS</div></header>
+<header><div><div class="logo">FIT<span>TRACK</span></div><div class="date" id="today"></div></div><div class="header-actions"><div class="pill">PERSONAL OS</div><button class="theme-switch" id="themeToggle" type="button" onclick="toggleTheme()" aria-label="Chuyển giao diện sáng tối">☀️ Sáng</button></div></header>
 <main>
 <section class="view active" id="home">
 <h1>Hôm nay, tập trung vào mình.</h1><div class="sub">Kỷ luật nhỏ mỗi ngày. Tiến bộ theo thời gian.</div>
@@ -162,6 +187,10 @@ h1{margin-top:12px}
 </nav>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+const THEME_KEY='fittrack-theme';
+function applyTheme(mode){const dark=mode==='dark';document.body.classList.toggle('theme-dark',dark);const b=document.getElementById('themeToggle');if(b){b.textContent=dark?'☀️ Sáng':'🌙 Tối';b.setAttribute('aria-label',dark?'Chuyển sang chế độ sáng':'Chuyển sang chế độ tối')}document.querySelector('meta[name="theme-color"]').setAttribute('content',dark?'#0a1427':'#f3f5f9')}
+function toggleTheme(){const next=document.body.classList.contains('theme-dark')?'light':'dark';localStorage.setItem(THEME_KEY,next);applyTheme(next)}
+applyTheme(localStorage.getItem(THEME_KEY)||'dark');
 const KEY='fittrack-v1';
 const CFG='fittrack-supabase-config';
 let sb=null, authUser=null, syncing=false;
