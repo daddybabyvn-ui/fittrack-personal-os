@@ -32,8 +32,10 @@ Deno.serve(async (req) => {
   const supported=(Array.isArray(catalog.models)?catalog.models:[])
    .filter((m:{name?:string,supportedGenerationMethods?:string[]})=>m.name?.startsWith('models/gemini-')&&m.supportedGenerationMethods?.includes('generateContent'))
    .map((m:{name:string})=>m.name);
+  // Exclude audio/TTS/live/embedding models; generateContent alone does not imply image support.
+  const imageModels=supported.filter((n:string)=>/gemini-(?:2\\.5|2\\.0|3(?:\\.|-))/i.test(n)&&/flash/i.test(n)&&!/tts|audio|live|native|embedding|computer|image-generation/i.test(n));
   const priority=['models/gemini-2.5-flash-lite','models/gemini-2.5-flash','models/gemini-2.0-flash-lite','models/gemini-2.0-flash'];
-  const ordered=[...priority.filter(n=>supported.includes(n)),...supported.filter((n:string)=>/flash/i.test(n)&&!priority.includes(n))].slice(0,6);
+  const ordered=[...priority.filter(n=>imageModels.includes(n)),...imageModels.filter((n:string)=>!priority.includes(n))].slice(0,6);
   if(!ordered.length)return respond({error:'No Gemini Flash model with generateContent is available for this API key.'},502);
   const requestBody=JSON.stringify({contents:[{parts:[{text:prompt},{inline_data:{mime_type:'image/jpeg',data:image.split(',')[1]}}]}],generationConfig:{responseMimeType:'application/json',temperature:0.2}});
   let result:Record<string,unknown>|null=null,lastError='';
@@ -45,7 +47,7 @@ Deno.serve(async (req) => {
     const err=await ai.json().catch(()=>({}));
     lastError=model+' HTTP '+ai.status+': '+String(err?.error?.message||'Request failed').slice(0,220);
     // Do not retry rate limits, auth failures or other errors on multiple models.
-    if(ai.status!==404)break;
+    if(ai.status!==404 && !(ai.status===400 && /image input modality|does not support image|image is not supported/i.test(String(err?.error?.message||''))))break;
     continue;
    }
    const json=await ai.json();
