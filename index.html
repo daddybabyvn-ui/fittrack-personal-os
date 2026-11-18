@@ -103,7 +103,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}td,th{text-align:left;p
 <div class="actions" style="margin-top:8px"><button class="secondary" onclick="syncNow()">Đồng bộ ngay</button><button class="ghost" onclick="signOut()">Đăng xuất</button></div>
 </div><div class="notice" style="margin-top:10px">Chỉ dùng khóa công khai (anon/publishable key), không bao giờ dán Service Role key vào website.</div></div>
 <div class="card"><h2>Mục tiêu nước</h2><label>Lượng nước mục tiêu (ml)</label><input id="waterGoal" type="number" value="2200"><button onclick="saveGoal()">Lưu mục tiêu</button></div>
-<div class="card"><h2>Dữ liệu</h2><div class="sub">Phiên bản hiện tại lưu dữ liệu trên thiết bị/trình duyệt này. Dữ liệu chưa tự đồng bộ giữa iPhone và máy tính.</div><div class="actions" style="margin-top:12px"><button class="secondary" onclick="exportData()">Xuất bản sao lưu</button><button class="ghost" onclick="resetData()">Xóa dữ liệu</button></div></div>
+<div class="card"><h2>Sao lưu & khôi phục dữ liệu</h2><div class="sub">Xuất dữ liệu tập luyện, nước uống, thói quen và chỉ số cơ thể ra file JSON. Giữ file ở nơi an toàn. Khi khôi phục, dữ liệu hiện tại sẽ được thay thế sau khi anh xác nhận.</div><div class="actions" style="margin-top:12px"><button class="secondary" onclick="exportData()">⬇ Xuất bản sao lưu JSON</button><button class="secondary" onclick="document.getElementById('backupFile').click()">⬆ Khôi phục từ file JSON</button><button class="ghost" onclick="resetData()">Xóa dữ liệu</button></div><input id="backupFile" type="file" accept=".json,application/json" class="hidden" onchange="importData(event)"><div class="sub" id="backupStatus" role="status" style="margin-top:10px">Nên sao lưu định kỳ và trước khi đổi thiết bị.</div></div>
 <div class="card"><h2>Cài lên iPhone</h2><div class="sub">Đưa website lên hosting HTTPS, mở bằng Safari → Chia sẻ → Thêm vào MH chính. Sau đó có thể mở từ biểu tượng FITTRACK.</div></div>
 </section>
 </main>
@@ -158,7 +158,40 @@ function saveWorkout(){let k=document.getElementById('workoutSelect').value,vals
 function saveBody(){let weight=Number(document.getElementById('weight').value),waist=Number(document.getElementById('waist').value),note=document.getElementById('bodyNote').value;if(!weight&&!waist){alert('Nhập ít nhất cân nặng hoặc vòng eo nhé.');return}data.body.unshift({date:day(),weight:weight||null,waist:waist||null,note});save();document.getElementById('weight').value='';document.getElementById('waist').value='';document.getElementById('bodyNote').value='';renderBody()}
 function renderBody(){document.getElementById('sessionCount').textContent=data.sessions.length;document.getElementById('bodyHistory').innerHTML=data.body.length?'<table><tr><th>Ngày</th><th>Cân nặng</th><th>Vòng eo</th></tr>'+data.body.slice(0,12).map(x=>`<tr><td>${x.date}</td><td>${x.weight??'—'} kg</td><td>${x.waist??'—'} cm</td></tr>`).join('')+'</table>':'Chưa có dữ liệu. Hãy thêm lần ghi nhận đầu tiên.'}
 function saveGoal(){let g=Number(document.getElementById('waterGoal').value);if(g<500||g>6000){alert('Hãy nhập mục tiêu từ 500 đến 6.000 ml.');return}data.goal=g;save();renderHome();alert('Đã lưu mục tiêu nước.')}
-function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='fittrack-backup.json';a.click();URL.revokeObjectURL(a.href)}
+function exportData(){
+  const backup={format:'fittrack-backup',version:1,exportedAt:new Date().toISOString(),data:JSON.parse(JSON.stringify(data))};
+  const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download='fittrack-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),3000);
+  document.getElementById('backupStatus').textContent='Đã tạo file sao lưu. Hãy kiểm tra thư mục Tải xuống.';
+}
+async function importData(event){
+  const input=event.target,file=input.files?.[0];if(!file)return;
+  const status=document.getElementById('backupStatus');
+  try{
+    if(file.size>5*1024*1024)throw Error('File lớn hơn 5 MB.');
+    const raw=JSON.parse(await file.text());
+    const incoming=raw?.format==='fittrack-backup'&&raw?.version===1?raw.data:raw;
+    if(!incoming||typeof incoming!=='object'||Array.isArray(incoming)||
+      !Array.isArray(incoming.habits)||!Array.isArray(incoming.body)||
+      !Array.isArray(incoming.sessions)||!incoming.water||typeof incoming.water!=='object'||Array.isArray(incoming.water)||
+      !incoming.checks||typeof incoming.checks!=='object'||Array.isArray(incoming.checks)||
+      !incoming.logs||typeof incoming.logs!=='object'||Array.isArray(incoming.logs)||
+      !Number.isFinite(Number(incoming.goal)))throw Error('File không đúng cấu trúc sao lưu FITTRACK.');
+    if(!confirm('Khôi phục sẽ THAY THẾ toàn bộ dữ liệu FITTRACK hiện tại trên thiết bị này'+(authUser?' và đồng bộ bản khôi phục lên tài khoản cloud':'')+'. Anh đã sao lưu dữ liệu hiện tại chưa?'))return;
+    const restored={...structuredClone(defaults),...incoming,_updatedAt:Date.now()};
+    const previous=data;
+    localStorage.setItem(KEY,JSON.stringify(restored));data=restored;init();
+    status.textContent='Đã khôi phục dữ liệu trên thiết bị.';
+    if(authUser&&sb){
+      try{await pushCloud();status.textContent='Đã khôi phục và đồng bộ dữ liệu lên cloud.'}
+      catch(e){status.textContent='Đã khôi phục trên thiết bị, nhưng chưa đồng bộ cloud: '+e.message}
+    }
+  }catch(e){status.textContent='Không thể khôi phục: '+e.message;alert(status.textContent)}
+  finally{input.value=''}
+}
 function resetData(){if(confirm('Xóa toàn bộ dữ liệu FITTRACK trên thiết bị này?')){localStorage.removeItem(KEY);data=load();init()}}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function init(){document.getElementById('waterGoal').value=data.goal;renderHome();renderHabits();renderPlan();renderExercises();renderBody()}
