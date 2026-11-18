@@ -134,7 +134,7 @@ textarea{width:100%;background:#f6f8fc;color:#24344d;border:1px solid #e6eaf1;bo
 </style>
 </head>
 <body>
-<header><div><div class="logo">FIT<span>TRACK</span></div><div class="date" id="today"></div></div><div class="header-actions"><div class="pill">v0.2.1</div><button class="theme-switch" id="themeToggle" type="button" onclick="toggleTheme()" aria-label="Chuyển giao diện sáng tối">☀️ Sáng</button></div></header>
+<header><div><div class="logo">FIT<span>TRACK</span></div><div class="date" id="today"></div></div><div class="header-actions"><div class="pill">v0.2.2</div><button class="theme-switch" id="themeToggle" type="button" onclick="toggleTheme()" aria-label="Chuyển giao diện sáng tối">☀️ Sáng</button></div></header>
 <main>
 <section class="view active" id="home">
 <h1>Hôm nay, tập trung vào mình.</h1><div class="sub">Kỷ luật nhỏ mỗi ngày. Tiến bộ theo thời gian.</div>
@@ -177,7 +177,7 @@ textarea{width:100%;background:#f6f8fc;color:#24344d;border:1px solid #e6eaf1;bo
 </section>
 
 <section class="view" id="settings">
-<h1>Cài đặt</h1><div class="sub">Thiết lập mục tiêu cá nhân.</div><div class="card"><div class="row"><div><h2 style="margin-bottom:5px">FITTRACK v0.2.1</h2><div class="sub">Lịch tháng và thống kê tập luyện · 18/11/2026</div></div><span class="pill" id="networkStatus">ĐANG KIỂM TRA</span></div><div class="sub">Dark Liquid Glass · Lịch tháng · Biểu đồ mức tạ · Sao lưu JSON · Đồng bộ có xác nhận khi dữ liệu khác nhau.</div><button type="button" class="secondary" style="margin-top:12px" onclick="checkAppUpdate()">Kiểm tra cập nhật ứng dụng</button><div id="appUpdateStatus" class="notice" role="status" style="margin-top:8px"></div></div>
+<h1>Cài đặt</h1><div class="sub">Thiết lập mục tiêu cá nhân.</div><div class="card"><div class="row"><div><h2 style="margin-bottom:5px">FITTRACK v0.2.2</h2><div class="sub">Lịch tháng và thống kê tập luyện · 18/11/2026</div></div><span class="pill" id="networkStatus">ĐANG KIỂM TRA</span></div><div class="sub">Dark Liquid Glass · Lịch tháng · Biểu đồ mức tạ · Sao lưu JSON · Đồng bộ có xác nhận khi dữ liệu khác nhau.</div><button type="button" class="secondary" style="margin-top:12px" onclick="updateAppNow()">Cập nhật ứng dụng ngay</button><div id="appUpdateStatus" class="notice" role="status" style="margin-top:8px"></div></div>
 <div class="card"><div class="row"><h2>Tài khoản & đồng bộ</h2><span class="pill" id="authStatus">CHƯA KẾT NỐI</span></div>
 <div class="sub" id="authMessage">Kết nối Supabase để đăng ký tài khoản và đồng bộ dữ liệu giữa các thiết bị.</div>
 <label>Supabase Project URL</label><input id="sbUrl" type="url" placeholder="https://xxxxx.supabase.co">
@@ -203,7 +203,7 @@ textarea{width:100%;background:#f6f8fc;color:#24344d;border:1px solid #e6eaf1;bo
 </nav>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const APP_VERSION='0.2.1';
+const APP_VERSION='0.2.2';
 const THEME_KEY='fittrack-theme';
 function applyTheme(mode){const dark=mode==='dark';document.body.classList.toggle('theme-dark',dark);const b=document.getElementById('themeToggle');if(b){b.textContent=dark?'☀️ Sáng':'🌙 Tối';b.setAttribute('aria-label',dark?'Chuyển sang chế độ sáng':'Chuyển sang chế độ tối')}document.querySelector('meta[name="theme-color"]').setAttribute('content',dark?'#0a1427':'#f3f5f9')}
 function toggleTheme(){const next=document.body.classList.contains('theme-dark')?'light':'dark';localStorage.setItem(THEME_KEY,next);applyTheme(next)}
@@ -255,7 +255,30 @@ function day(){let d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1
 function dayLabel(){return new Date().toLocaleDateString('vi-VN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
 function updateNetworkStatus(){const el=document.getElementById('networkStatus');if(el)el.textContent=navigator.onLine?'TRỰC TUYẾN':'NGOẠI TUYẾN'}
 window.addEventListener('online',()=>{updateNetworkStatus();if(authUser)syncNow()});window.addEventListener('offline',updateNetworkStatus);
-async function checkAppUpdate(){const el=document.getElementById('appUpdateStatus');el.textContent='Đang kiểm tra phiên bản mới...';try{if('serviceWorker' in navigator){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update()}const response=await fetch('./index.html?version-check='+Date.now(),{cache:'no-store'});if(!response.ok)throw Error('Không tải được phiên bản từ máy chủ');const html=await response.text();const m=html.match(/const APP_VERSION='([^']+)'/);if(m&&m[1]!==APP_VERSION){el.textContent='Có phiên bản mới '+m[1]+'. Hãy đóng và mở lại ứng dụng.';return}el.textContent='Anh đang dùng FITTRACK v'+APP_VERSION+' mới nhất trên máy chủ.'}catch(e){el.textContent='Chưa kiểm tra được cập nhật. Kiểm tra kết nối mạng và thử lại.'}}
+async function updateAppNow(){
+ const el=document.getElementById('appUpdateStatus'),btn=document.querySelector('[onclick="updateAppNow()"]');
+ if(!navigator.onLine){el.textContent='Cần kết nối mạng để cập nhật ứng dụng.';return}
+ if(btn)btn.disabled=true;
+ el.textContent='Đang kiểm tra và tải phiên bản mới...';
+ try{
+  const response=await fetch('./index.html?app-update='+Date.now(),{cache:'no-store'});
+  if(!response.ok)throw Error('Không tải được bản mới');
+  const html=await response.text(),m=html.match(/const APP_VERSION='([^']+)'/);
+  if(!m)throw Error('Không xác định được phiên bản');
+  if('serviceWorker' in navigator){
+   const reg=await navigator.serviceWorker.getRegistration();
+   if(reg){
+    await reg.update();
+    const cache=await caches.open('fittrack-cache-v'+m[1]);
+    await cache.put(new URL('./index.html',location.href).href,new Response(html,{headers:{'Content-Type':'text/html; charset=utf-8'}}));
+   }
+  }
+  if(m[1]===APP_VERSION){el.textContent='Đang dùng phiên bản mới nhất v'+APP_VERSION+'. Anh có thể tải lại để làm mới giao diện.'}
+  else el.textContent='Đã tải FITTRACK v'+m[1]+'. Ứng dụng sẽ mở lại ngay.';
+  if(m[1]!==APP_VERSION)location.reload();
+ }catch(e){el.textContent='Không cập nhật được: '+e.message+'. Dữ liệu hiện tại vẫn được giữ.'}
+ finally{if(btn)btn.disabled=false}
+}
 function show(id){document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('active',x.dataset.view===id));if(id==='workout')renderExercises();if(id==='progress'){renderBody();renderExerciseTrend()}}
 const plans={
 mon:{name:'Upper A',desc:'Ngực trên · Vai ngang · Lưng xô',items:[['Incline Chest Press Machine','3 × 8–12'],['Lat Pulldown','3 × 8–12'],['Chest Press Machine','2 × 10–12'],['Seated Cable Row','2 × 10–12'],['Dumbbell Lateral Raise','3 × 12–15'],['Reverse Pec Deck','2 × 12–15'],['Triceps Rope Pushdown','2 × 10–15']]},
