@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
    .filter((m:{name?:string,supportedGenerationMethods?:string[]})=>m.name?.startsWith('models/gemini-')&&m.supportedGenerationMethods?.includes('generateContent'))
    .map((m:{name:string})=>m.name);
   // Exclude audio/TTS/live/embedding models; generateContent alone does not imply image support.
-  const imageModels=supported.filter((n:string)=>/gemini-(?:2\\.5|2\\.0|3(?:\\.|-))/i.test(n)&&/flash/i.test(n)&&!/tts|audio|live|native|embedding|computer|image-generation/i.test(n));
+  const imageModels=supported.filter((n:string)=>/gemini-(?:2[.]5|2[.]0|3(?:[.]|-))/i.test(n)&&/flash/i.test(n)&&!/tts|audio|live|native|embedding|computer|image-generation/i.test(n));
   const priority=['models/gemini-2.5-flash-lite','models/gemini-2.5-flash','models/gemini-2.0-flash-lite','models/gemini-2.0-flash'];
   const ordered=[...priority.filter(n=>imageModels.includes(n)),...imageModels.filter((n:string)=>!priority.includes(n))].slice(0,6);
   if(!ordered.length)return respond({error:'No Gemini Flash model with generateContent is available for this API key.'},502);
