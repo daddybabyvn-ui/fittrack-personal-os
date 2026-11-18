@@ -126,6 +126,7 @@ body.theme-dark{color-scheme:dark;--bg:#080f1e;--panel:rgba(24,36,59,.58);--pane
 .calendar-day .daydot{width:5px;height:5px;border-radius:50%;background:transparent}
 .calendar-day.logged .daydot{background:#5cbbff}.calendar-day.selected{background:#2878f0;color:#fff;border-color:#2878f0}
 .calendar-day.selected .daydot{background:#fff}.calendar-day.today:not(.selected){border-color:#70aaff}
+ .month-calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin:15px 0}.month-calendar .month-head{text-align:center;font-size:11px;color:var(--muted);padding:6px 0}.month-calendar button{padding:9px 1px;min-height:47px;background:var(--panel2);color:var(--white);border:1px solid var(--line);border-radius:12px;box-shadow:none;font-size:14px}.month-calendar button.selected{background:#2878f0;color:white}.month-calendar button.today{border-color:#70aaff}.month-calendar button.logged:after{content:"";display:block;width:5px;height:5px;border-radius:50%;background:#4aabff;margin:3px auto -8px}.month-calendar button.selected.logged:after{background:white}.theme-dark .month-calendar button{background:rgba(110,154,220,.12);color:#eef5ff}.theme-dark .month-calendar button.selected{background:#327fe7}.trend-chart{margin:16px 0;min-height:70px;overflow:hidden}.trend-chart svg{width:100%;height:auto;display:block}.trend-row{padding:9px 0;border-bottom:1px solid var(--line)}
 textarea{width:100%;background:#f6f8fc;color:#24344d;border:1px solid #e6eaf1;border-radius:14px;min-height:90px;padding:12px 13px;font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;resize:vertical}
 .theme-dark textarea{background:rgba(8,17,32,.48);color:#eef5ff;border-color:rgba(199,221,255,.2)}
 .theme-dark .calendar-day{background:rgba(110,154,220,.12);color:#eef5ff}.theme-dark .calendar-day.selected{background:#327fe7;color:#fff}
@@ -133,7 +134,7 @@ textarea{width:100%;background:#f6f8fc;color:#24344d;border:1px solid #e6eaf1;bo
 </style>
 </head>
 <body>
-<header><div><div class="logo">FIT<span>TRACK</span></div><div class="date" id="today"></div></div><div class="header-actions"><div class="pill">v0.1.0</div><button class="theme-switch" id="themeToggle" type="button" onclick="toggleTheme()" aria-label="Chuyển giao diện sáng tối">☀️ Sáng</button></div></header>
+<header><div><div class="logo">FIT<span>TRACK</span></div><div class="date" id="today"></div></div><div class="header-actions"><div class="pill">v0.2.0</div><button class="theme-switch" id="themeToggle" type="button" onclick="toggleTheme()" aria-label="Chuyển giao diện sáng tối">☀️ Sáng</button></div></header>
 <main>
 <section class="view active" id="home">
 <h1>Hôm nay, tập trung vào mình.</h1><div class="sub">Kỷ luật nhỏ mỗi ngày. Tiến bộ theo thời gian.</div>
@@ -148,7 +149,7 @@ textarea{width:100%;background:#f6f8fc;color:#24344d;border:1px solid #e6eaf1;bo
 
 <section class="view" id="workout">
 <h1>Lịch tập của anh</h1><div class="sub">Chọn ngày, sắp xếp buổi tập linh hoạt và ghi nhật ký riêng theo ngày.</div>
-<div class="card"><div class="row"><h2>Lịch 7 ngày</h2><div class="actions"><button class="secondary" type="button" onclick="moveWeek(-7)">‹</button><button class="secondary" type="button" onclick="moveWeek(0)">Hôm nay</button><button class="secondary" type="button" onclick="moveWeek(7)">›</button></div></div><div class="sub" id="weekRange"></div><div id="weekCalendar" class="calendar-week"></div><div class="sub" style="margin-top:12px">Chạm vào ngày để xem hoặc chỉnh lịch tập. Dấu chấm cho biết ngày đã có nhật ký.</div></div>
+<div class="card"><div class="row"><h2>Lịch tập</h2><button type="button" class="secondary" onclick="toggleMonthView()" id="monthToggle">Xem lịch tháng</button></div><div id="monthView" class="hidden"><div class="row"><button type="button" class="secondary" onclick="moveMonth(-1)">‹</button><strong id="monthTitle"></strong><button type="button" class="secondary" onclick="moveMonth(1)">›</button></div><div id="monthCalendar" class="month-calendar"></div><div class="sub">Chạm ngày để mở nhật ký. Chấm xanh: đã ghi nhật ký.</div></div><div id="weekView"><div class="row"><h2>Lịch 7 ngày</h2><div class="actions"><button class="secondary" type="button" onclick="moveWeek(-7)">‹</button><button class="secondary" type="button" onclick="moveWeek(0)">Hôm nay</button><button class="secondary" type="button" onclick="moveWeek(7)">›</button></div></div><div class="sub" id="weekRange"></div><div id="weekCalendar" class="calendar-week"></div><div class="sub" style="margin-top:12px">Chạm vào ngày để xem hoặc chỉnh lịch tập. Dấu chấm cho biết ngày đã có nhật ký.</div></div></div>
 <div class="card"><div class="row"><h2 id="selectedWorkoutDate">Nhật ký tập luyện</h2><span class="pill" id="selectedWorkoutStatus">CHƯA GHI</span></div>
 <label>Chọn ngày khác</label><input id="workoutDate" type="date" onchange="chooseWorkoutDate(this.value)">
 <label>Buổi tập trong ngày</label><select id="workoutSelect" onchange="changeWorkoutPlan()"><option value="rest">Nghỉ / phục hồi</option><option value="mon">Upper A</option><option value="tue">Lower A + Core</option><option value="thu">Upper B</option><option value="sat">Lower B + Core</option></select>
@@ -172,11 +173,11 @@ textarea{width:100%;background:#f6f8fc;color:#24344d;border:1px solid #e6eaf1;bo
 <label>Ghi chú</label><input id="bodyNote" placeholder="Cảm nhận / ảnh tiến độ...">
 <button onclick="saveBody()">Lưu chỉ số</button></div>
 <div class="card"><h2>Lịch sử gần đây</h2><div id="bodyHistory" class="sub">Chưa có dữ liệu. Hãy thêm lần ghi nhận đầu tiên.</div></div>
-<div class="card"><h2>Thống kê tập luyện</h2><div class="stat" id="sessionCount">0</div><div class="sub">Buổi tập đã lưu trên thiết bị này</div></div>
+<div class="card"><h2>Tiến bộ mức tạ theo bài tập</h2><div class="sub">Biểu đồ lấy mức tạ đầu tiên có đơn vị kg trong nhật ký của từng bài. Các ghi chú không có kg sẽ không được tính.</div><label>Chọn bài tập</label><select id="exerciseTrendSelect" onchange="renderExerciseTrend()"></select><div id="exerciseTrendChart" class="trend-chart"></div><div id="exerciseTrendHistory" class="sub"></div></div><div class="card"><h2>Thống kê tập luyện</h2><div class="stat" id="sessionCount">0</div><div class="sub">Buổi tập đã lưu trên thiết bị này</div></div>
 </section>
 
 <section class="view" id="settings">
-<h1>Cài đặt</h1><div class="sub">Thiết lập mục tiêu cá nhân.</div><div class="card"><div class="row"><div><h2 style="margin-bottom:5px">FITTRACK v0.1.0</h2><div class="sub">Phiên bản nền tảng · 18/11/2026</div></div><span class="pill" id="networkStatus">ĐANG KIỂM TRA</span></div><div class="sub">Dark Liquid Glass · Lịch tập 7 ngày · Nhật ký theo ngày · Sao lưu JSON · Đồng bộ tài khoản.</div><button type="button" class="secondary" style="margin-top:12px" onclick="checkAppUpdate()">Kiểm tra cập nhật ứng dụng</button><div id="appUpdateStatus" class="notice" role="status" style="margin-top:8px"></div></div>
+<h1>Cài đặt</h1><div class="sub">Thiết lập mục tiêu cá nhân.</div><div class="card"><div class="row"><div><h2 style="margin-bottom:5px">FITTRACK v0.2.0</h2><div class="sub">Lịch tháng và thống kê tập luyện · 18/11/2026</div></div><span class="pill" id="networkStatus">ĐANG KIỂM TRA</span></div><div class="sub">Dark Liquid Glass · Lịch tập 7 ngày · Nhật ký theo ngày · Sao lưu JSON · Đồng bộ tài khoản.</div><button type="button" class="secondary" style="margin-top:12px" onclick="checkAppUpdate()">Kiểm tra cập nhật ứng dụng</button><div id="appUpdateStatus" class="notice" role="status" style="margin-top:8px"></div></div>
 <div class="card"><div class="row"><h2>Tài khoản & đồng bộ</h2><span class="pill" id="authStatus">CHƯA KẾT NỐI</span></div>
 <div class="sub" id="authMessage">Kết nối Supabase để đăng ký tài khoản và đồng bộ dữ liệu giữa các thiết bị.</div>
 <label>Supabase Project URL</label><input id="sbUrl" type="url" placeholder="https://xxxxx.supabase.co">
@@ -202,7 +203,7 @@ textarea{width:100%;background:#f6f8fc;color:#24344d;border:1px solid #e6eaf1;bo
 </nav>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const APP_VERSION='0.1.0';
+const APP_VERSION='0.2.0';
 const THEME_KEY='fittrack-theme';
 function applyTheme(mode){const dark=mode==='dark';document.body.classList.toggle('theme-dark',dark);const b=document.getElementById('themeToggle');if(b){b.textContent=dark?'☀️ Sáng':'🌙 Tối';b.setAttribute('aria-label',dark?'Chuyển sang chế độ sáng':'Chuyển sang chế độ tối')}document.querySelector('meta[name="theme-color"]').setAttribute('content',dark?'#0a1427':'#f3f5f9')}
 function toggleTheme(){const next=document.body.classList.contains('theme-dark')?'light':'dark';localStorage.setItem(THEME_KEY,next);applyTheme(next)}
@@ -228,7 +229,7 @@ function dayLabel(){return new Date().toLocaleDateString('vi-VN',{weekday:'long'
 function updateNetworkStatus(){const el=document.getElementById('networkStatus');if(el)el.textContent=navigator.onLine?'TRỰC TUYẾN':'NGOẠI TUYẾN'}
 window.addEventListener('online',updateNetworkStatus);window.addEventListener('offline',updateNetworkStatus);
 async function checkAppUpdate(){const el=document.getElementById('appUpdateStatus');el.textContent='Đang kiểm tra phiên bản mới...';try{if('serviceWorker' in navigator){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update()}const response=await fetch('./index.html?version-check='+Date.now(),{cache:'no-store'});if(!response.ok)throw Error('Không tải được phiên bản từ máy chủ');const html=await response.text();const m=html.match(/const APP_VERSION='([^']+)'/);if(m&&m[1]!==APP_VERSION){el.textContent='Có phiên bản mới '+m[1]+'. Hãy đóng và mở lại ứng dụng.';return}el.textContent='Anh đang dùng FITTRACK v'+APP_VERSION+' mới nhất trên máy chủ.'}catch(e){el.textContent='Chưa kiểm tra được cập nhật. Kiểm tra kết nối mạng và thử lại.'}}
-function show(id){document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('active',x.dataset.view===id));if(id==='workout')renderExercises();if(id==='progress')renderBody()}
+function show(id){document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('active',x.dataset.view===id));if(id==='workout')renderExercises();if(id==='progress'){renderBody();renderExerciseTrend()}}
 const plans={
 mon:{name:'Upper A',desc:'Ngực trên · Vai ngang · Lưng xô',items:[['Incline Chest Press Machine','3 × 8–12'],['Lat Pulldown','3 × 8–12'],['Chest Press Machine','2 × 10–12'],['Seated Cable Row','2 × 10–12'],['Dumbbell Lateral Raise','3 × 12–15'],['Reverse Pec Deck','2 × 12–15'],['Triceps Rope Pushdown','2 × 10–15']]},
 tue:{name:'Lower A + Core',desc:'Chân · Mông · Bụng',items:[['Leg Press','3 × 10–12'],['Romanian Deadlift','3 × 8–12'],['Seated Leg Curl','3 × 10–15'],['Leg Extension','2 × 12–15'],['Standing Calf Raise','3 × 12–15'],['Cable Crunch','3 × 10–15'],['Plank','3 × 30–45 giây']]},
@@ -252,11 +253,14 @@ function localISO(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(
 function parseISO(s){const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)}
 function dateShift(s,n){const d=parseISO(s);d.setDate(d.getDate()+n);return localISO(d)}
 function mondayOf(s){const d=parseISO(s);return dateShift(s,-((d.getDay()+6)%7))}
-let selectedWorkoutDay=workoutToday(),visibleWeek=mondayOf(selectedWorkoutDay);
+let selectedWorkoutDay=workoutToday(),visibleWeek=mondayOf(selectedWorkoutDay),visibleMonth=selectedWorkoutDay.slice(0,7),monthMode=false;
 function dayEntry(date){return data.workoutDays?.[date]||null}
 function templateFor(date){const wd=parseISO(date).getDay();return ({1:'mon',2:'tue',4:'thu',6:'sat'})[wd]||'rest'}
 function planForDate(date){return dayEntry(date)?.plan??templateFor(date)}
 function ensureWorkoutDays(){if(!data.workoutDays||typeof data.workoutDays!=='object'||Array.isArray(data.workoutDays))data.workoutDays={}}
+function toggleMonthView(){monthMode=!monthMode;document.getElementById('monthView').classList.toggle('hidden',!monthMode);document.getElementById('weekView').classList.toggle('hidden',monthMode);document.getElementById('monthToggle').textContent=monthMode?'Xem lịch tuần':'Xem lịch tháng';renderMonth()}
+function moveMonth(n){const [y,m]=visibleMonth.split('-').map(Number);const d=new Date(y,m-1+n,1);visibleMonth=localISO(d).slice(0,7);renderMonth()}
+function renderMonth(){const [y,m]=visibleMonth.split('-').map(Number);document.getElementById('monthTitle').textContent='Tháng '+m+'/'+y;const first=new Date(y,m-1,1),days=new Date(y,m,0).getDate(),offset=(first.getDay()+6)%7;let html=['T2','T3','T4','T5','T6','T7','CN'].map(x=>'<span class="month-head">'+x+'</span>').join('');html+='<span></span>'.repeat(offset);for(let d=1;d<=days;d++){const date=localISO(new Date(y,m-1,d));html+='<button type="button" class="'+(date===selectedWorkoutDay?'selected ':'')+(date===workoutToday()?'today ':'')+(dayEntry(date)?'logged':'')+'" onclick="chooseWorkoutDate(\''+date+'\')">'+d+'</button>'}document.getElementById('monthCalendar').innerHTML=html}
 function renderPlan(){
  const labels=['T2','T3','T4','T5','T6','T7','CN'];
  document.getElementById('weekRange').textContent='Tuần '+dateShift(visibleWeek,0).split('-').reverse().join('/')+' – '+dateShift(visibleWeek,6).split('-').reverse().join('/');
@@ -269,7 +273,7 @@ function moveWeek(n){visibleWeek=n===0?mondayOf(workoutToday()):dateShift(visibl
 function chooseWorkoutDate(date){
  if(date!==selectedWorkoutDay&&document.getElementById('workoutDayNote')){const current=dayEntry(selectedWorkoutDay),plan=document.getElementById('workoutSelect').value,note=document.getElementById('workoutDayNote').value,inputs=captureExerciseNotes(),stored=current?.plan===plan?current.exerciseNotes||{}:{};if(note!==(current?.note||'')||plan!==planForDate(selectedWorkoutDay)||Object.keys(inputs).some(k=>inputs[k]!==String(stored[k]??data.logs[plan+'-'+k.replace('base-','')]??''))){if(!confirm('Anh có thay đổi chưa lưu trong nhật ký ngày này. Chuyển ngày và bỏ thay đổi?')){document.getElementById('workoutDate').value=selectedWorkoutDay;return}}}
  if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||isNaN(parseISO(date).getTime()))return;
- selectedWorkoutDay=date;visibleWeek=mondayOf(date);
+ selectedWorkoutDay=date;visibleWeek=mondayOf(date);visibleMonth=date.slice(0,7);
  const d=parseISO(date);
  document.getElementById('workoutDate').value=date;
  document.getElementById('selectedWorkoutDate').textContent='Nhật ký · '+['Chủ nhật','Thứ 2','Thứ 3','Thứ 4','Thứ 5','Thứ 6','Thứ 7'][d.getDay()]+', '+d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear();
@@ -277,7 +281,7 @@ function chooseWorkoutDate(date){
  document.getElementById('workoutDayNote').value=dayEntry(date)?.note||'';
  document.getElementById('selectedWorkoutStatus').textContent=dayEntry(date)?'ĐÃ LƯU':'CHƯA GHI';
  document.getElementById('workoutSaved').textContent='';
- renderPlan();renderExercises();
+ renderPlan();renderMonth();renderExercises();
 }
 function changeWorkoutPlan(){renderExercises();document.getElementById('workoutSaved').textContent='Nhấn Lưu nhật ký ngày này để ghi thay đổi lịch tập.'}
 function extraItems(k){const entry=dayEntry(selectedWorkoutDay);return entry?.plan===k&&Array.isArray(entry.extras)?entry.extras:[]}
@@ -367,7 +371,9 @@ async function importData(event){
 }
 function resetData(){if(confirm('Xóa toàn bộ dữ liệu FITTRACK trên thiết bị này?')){localStorage.removeItem(KEY);data=load();init()}}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function init(){document.getElementById('waterGoal').value=data.goal;renderHome();renderHabits();chooseWorkoutDate(selectedWorkoutDay);renderBody()}
+function exerciseTrendData(){const all=[];Object.entries(data.workoutDays||{}).forEach(([date,entry])=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!entry||!plans[entry.plan])return;const base=plans[entry.plan].items;Object.entries(entry.exerciseNotes||{}).forEach(([key,note])=>{const match=String(note).match(/(\d+(?:[.,]\d+)?)\s*kg\b/i);if(!match)return;let name;if(key.startsWith('base-'))name=base[Number(key.slice(5))]?.[0];else if(key.startsWith('extra-'))name=(entry.extras||[]).find(x=>'extra-'+x.id===key)?.name;if(name)all.push({date,name,kg:Number(match[1].replace(',','.'))})})});return all.sort((a,b)=>a.date.localeCompare(b.date))}
+function renderExerciseTrend(){const sel=document.getElementById('exerciseTrendSelect'),chart=document.getElementById('exerciseTrendChart'),history=document.getElementById('exerciseTrendHistory');if(!sel)return;const records=exerciseTrendData(),names=[...new Set(records.map(x=>x.name))].sort(),old=sel.value;sel.innerHTML=names.map(n=>'<option value="'+esc(n)+'">'+esc(n)+'</option>').join('');if(names.includes(old))sel.value=old;if(!names.length){chart.innerHTML='<div class="sub">Chưa có dữ liệu mức tạ. Anh ghi ví dụ: 20 kg · 10 reps vào nhật ký và lưu.</div>';history.innerHTML='';return}const rows=records.filter(x=>x.name===sel.value),w=560,h=190,p=32,values=rows.map(x=>x.kg),min=Math.min(...values),max=Math.max(...values),range=max-min||1;const pts=rows.map((x,i)=>({x:p+(rows.length===1?.5:i/(rows.length-1))*(w-2*p),y:h-p-(x.kg-min)/range*(h-2*p)}));const line=pts.map((q,i)=>(i?'L':'M')+q.x.toFixed(1)+' '+q.y.toFixed(1)).join(' ');chart.innerHTML='<svg viewBox="0 0 '+w+' '+h+'" role="img" aria-label="Biểu đồ mức tạ theo thời gian"><line x1="'+p+'" y1="'+(h-p)+'" x2="'+(w-p)+'" y2="'+(h-p)+'" stroke="currentColor" opacity=".25"/><path d="'+line+'" fill="none" stroke="#5ba8ff" stroke-width="3" stroke-linecap="round"/>'+pts.map((q,i)=>'<circle cx="'+q.x+'" cy="'+q.y+'" r="4" fill="#5ba8ff"/><text x="'+q.x+'" y="'+(q.y-10)+'" font-size="11" text-anchor="middle" fill="currentColor">'+values[i]+' kg</text>').join('')+'</svg>';history.innerHTML=rows.slice().reverse().slice(0,12).map(x=>'<div class="trend-row">'+esc(x.date.split('-').reverse().join('/'))+' · <strong>'+x.kg+' kg</strong></div>').join('')}
+function init(){document.getElementById('waterGoal').value=data.goal;renderHome();renderHabits();chooseWorkoutDate(selectedWorkoutDay);renderBody();renderExerciseTrend()}
 init();bootCloud();updateNetworkStatus();
 if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
 </script>
