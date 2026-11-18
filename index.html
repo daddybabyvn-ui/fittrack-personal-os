@@ -119,6 +119,17 @@ body.theme-dark{color-scheme:dark;--bg:#080f1e;--panel:rgba(24,36,59,.58);--pane
 .header-actions{display:flex;align-items:center;gap:8px}
 @media(max-width:390px){.header-actions>.pill{display:none}.theme-switch{font-size:12px;padding:7px 10px}}
 
+
+.calendar-week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-top:15px}
+.calendar-day{min-width:0;padding:10px 2px 9px;border-radius:17px;border:1px solid var(--line);background:var(--panel2);color:var(--white);box-shadow:none;display:flex;flex-direction:column;align-items:center;gap:5px}
+.calendar-day .weekday{font-size:10px;opacity:.75}.calendar-day .daynum{font-size:18px;font-weight:800}
+.calendar-day .daydot{width:5px;height:5px;border-radius:50%;background:transparent}
+.calendar-day.logged .daydot{background:#5cbbff}.calendar-day.selected{background:#2878f0;color:#fff;border-color:#2878f0}
+.calendar-day.selected .daydot{background:#fff}.calendar-day.today:not(.selected){border-color:#70aaff}
+textarea{width:100%;background:#f6f8fc;color:#24344d;border:1px solid #e6eaf1;border-radius:14px;min-height:90px;padding:12px 13px;font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;resize:vertical}
+.theme-dark textarea{background:rgba(8,17,32,.48);color:#eef5ff;border-color:rgba(199,221,255,.2)}
+.theme-dark .calendar-day{background:rgba(110,154,220,.12);color:#eef5ff}.theme-dark .calendar-day.selected{background:#327fe7;color:#fff}
+@media(max-width:420px){.calendar-week{gap:4px}.calendar-day{padding:10px 1px}.calendar-day .daynum{font-size:16px}.calendar-day .weekday{font-size:9px}}
 </style>
 </head>
 <body>
@@ -136,12 +147,16 @@ body.theme-dark{color-scheme:dark;--bg:#080f1e;--panel:rgba(24,36,59,.58);--pane
 </section>
 
 <section class="view" id="workout">
-<h1>Workout</h1><div class="sub">Lịch Aesthetic 4 buổi/tuần · 90 phút/buổi</div>
-<div class="card"><div class="row"><h2>Lịch trong tuần</h2><span class="pill">4 DAYS</span></div><div id="weekPlan"></div></div>
-<div class="card"><div class="row"><h2>Ghi buổi tập</h2><span class="sub">Lưu lại mức tạ và reps</span></div>
-<label>Chọn buổi</label><select id="workoutSelect" onchange="renderExercises()"><option value="mon">Thứ 2 — Upper A</option><option value="tue">Thứ 3 — Lower A</option><option value="thu">Thứ 5 — Upper B</option><option value="sat">Thứ 7 — Lower B</option></select>
-<div id="exerciseList"></div><div class="card" style="background:var(--panel2);margin-top:14px"><h3>+ Thêm bài tập vào buổi này</h3><label>Tên bài tập</label><input id="extraExerciseName" placeholder="Ví dụ: Cable Fly"><label>Số hiệp × số reps</label><input id="extraExerciseSets" placeholder="Ví dụ: 3 × 12–15"><button type="button" class="secondary" onclick="addExtraExercise()">+ Thêm bài tập</button></div><button style="width:100%;margin-top:12px" onclick="saveWorkout()">Lưu buổi tập hôm nay</button><div class="notice" id="workoutSaved" style="margin-top:8px"></div></div>
-</section>
+<h1>Lịch tập của anh</h1><div class="sub">Chọn ngày, sắp xếp buổi tập linh hoạt và ghi nhật ký riêng theo ngày.</div>
+<div class="card"><div class="row"><h2>Lịch 7 ngày</h2><div class="actions"><button class="secondary" type="button" onclick="moveWeek(-7)">‹</button><button class="secondary" type="button" onclick="moveWeek(0)">Hôm nay</button><button class="secondary" type="button" onclick="moveWeek(7)">›</button></div></div><div class="sub" id="weekRange"></div><div id="weekCalendar" class="calendar-week"></div><div class="sub" style="margin-top:12px">Chạm vào ngày để xem hoặc chỉnh lịch tập. Dấu chấm cho biết ngày đã có nhật ký.</div></div>
+<div class="card"><div class="row"><h2 id="selectedWorkoutDate">Nhật ký tập luyện</h2><span class="pill" id="selectedWorkoutStatus">CHƯA GHI</span></div>
+<label>Chọn ngày khác</label><input id="workoutDate" type="date" onchange="chooseWorkoutDate(this.value)">
+<label>Buổi tập trong ngày</label><select id="workoutSelect" onchange="changeWorkoutPlan()"><option value="rest">Nghỉ / phục hồi</option><option value="mon">Upper A</option><option value="tue">Lower A + Core</option><option value="thu">Upper B</option><option value="sat">Lower B + Core</option></select>
+<label>Ghi chú theo ngày</label><textarea id="workoutDayNote" rows="3" placeholder="Ví dụ: Hôm nay hơi mệt, tập nhẹ hơn; mục tiêu buổi sau..."></textarea>
+<div id="exerciseList"></div>
+<div class="card" id="addExercisePanel" style="background:var(--panel2);margin-top:14px"><h3>+ Thêm bài tập vào buổi này</h3><label>Tên bài tập</label><input id="extraExerciseName" placeholder="Ví dụ: Cable Fly"><label>Số hiệp × số reps</label><input id="extraExerciseSets" placeholder="Ví dụ: 3 × 12–15"><button type="button" class="secondary" onclick="addExtraExercise()">+ Thêm bài tập</button></div>
+<button style="width:100%;margin-top:12px" onclick="saveWorkout()">Lưu nhật ký ngày này</button><div class="notice" id="workoutSaved" style="margin-top:8px"></div>
+</div></section>
 
 <section class="view" id="habits">
 <h1>Daily habits</h1><div class="sub">Đánh dấu những việc bạn đã hoàn thành hôm nay.</div>
@@ -220,51 +235,93 @@ function renderHome(){
 document.getElementById('today').textContent=dayLabel();
 let w=data.water[day()]||0;document.getElementById('waterNum').textContent=w.toLocaleString('vi-VN');document.getElementById('waterBar').style.width=Math.min(100,w/data.goal*100)+'%';
 let checks=data.checks[day()]||[];document.getElementById('habitCount').textContent=checks.length+'/'+data.habits.length;document.getElementById('habitBar').style.width=(checks.length/Math.max(1,data.habits.length)*100)+'%';document.getElementById('habitSummary').textContent=checks.length+' hoàn thành';
-let p=plans[dayKey];document.getElementById('todayWorkout').textContent=p?p.name:'Ngày nghỉ / phục hồi';document.getElementById('todayWorkoutDesc').textContent=p?p.desc:'Đi bộ nhẹ, vận động thoải mái và ngủ đủ.';document.getElementById('todayWorkoutTag').textContent=p?'GYM DAY':'RECOVERY';
+let planKey=planForDate(workoutToday()),p=plans[planKey];document.getElementById('todayWorkout').textContent=p?p.name:'Ngày nghỉ / phục hồi';document.getElementById('todayWorkoutDesc').textContent=p?p.desc:'Đi bộ nhẹ, vận động thoải mái và ngủ đủ.';document.getElementById('todayWorkoutTag').textContent=p?'GYM DAY':'RECOVERY';
 document.getElementById('homeHabits').innerHTML=data.habits.slice(0,5).map((h,i)=>`<div class="habit"><input type="checkbox" ${checks.includes(i)?'checked':''} onchange="toggleHabit(${i},this.checked)"><span>${esc(h)}</span></div>`).join('');
 }
 function addWater(n){data.water[day()]=(data.water[day()]||0)+n;save();renderHome()}
 function renderHabits(){let c=data.checks[day()]||[];document.getElementById('habitPct').textContent=Math.round(c.length/Math.max(1,data.habits.length)*100)+'%';document.getElementById('habitList').innerHTML=data.habits.map((h,i)=>`<div class="habit"><input type="checkbox" ${c.includes(i)?'checked':''} onchange="toggleHabit(${i},this.checked)"><span>${esc(h)}</span></div>`).join('');}
 function toggleHabit(i,v){let c=data.checks[day()]||[];data.checks[day()]=v?[...new Set([...c,i])]:c.filter(x=>x!==i);save();renderHome();renderHabits()}
 function addHabit(){let x=document.getElementById('newHabit').value.trim();if(!x)return;data.habits.push(x);document.getElementById('newHabit').value='';save();renderHabits();renderHome()}
-function renderPlan(){document.getElementById('weekPlan').innerHTML=[['Thứ 2','mon'],['Thứ 3','tue'],['Thứ 4','rest'],['Thứ 5','thu'],['Thứ 6','rest'],['Thứ 7','sat'],['Chủ nhật','rest']].map(([d,k])=>`<div class="exercise"><div class="row"><b>${d}</b><span class="pill">${plans[k]?.name||'Nghỉ / phục hồi'}</span></div><small>${plans[k]?.desc||'Đi bộ nhẹ, nghỉ ngơi'}</small></div>`).join('')}
-function extraItems(k){if(!data.extraExercises||typeof data.extraExercises!=='object')data.extraExercises={};if(!Array.isArray(data.extraExercises[k]))data.extraExercises[k]=[];return data.extraExercises[k]}
+
+const workoutToday=()=>{const d=new Date();return localISO(d)};
+function localISO(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function parseISO(s){const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)}
+function dateShift(s,n){const d=parseISO(s);d.setDate(d.getDate()+n);return localISO(d)}
+function mondayOf(s){const d=parseISO(s);return dateShift(s,-((d.getDay()+6)%7))}
+let selectedWorkoutDay=workoutToday(),visibleWeek=mondayOf(selectedWorkoutDay);
+function dayEntry(date){return data.workoutDays?.[date]||null}
+function templateFor(date){const wd=parseISO(date).getDay();return ({1:'mon',2:'tue',4:'thu',6:'sat'})[wd]||'rest'}
+function planForDate(date){return dayEntry(date)?.plan??templateFor(date)}
+function ensureWorkoutDays(){if(!data.workoutDays||typeof data.workoutDays!=='object'||Array.isArray(data.workoutDays))data.workoutDays={}}
+function renderPlan(){
+ const labels=['T2','T3','T4','T5','T6','T7','CN'];
+ document.getElementById('weekRange').textContent='Tuần '+dateShift(visibleWeek,0).split('-').reverse().join('/')+' – '+dateShift(visibleWeek,6).split('-').reverse().join('/');
+ document.getElementById('weekCalendar').innerHTML=labels.map((label,i)=>{
+ const date=dateShift(visibleWeek,i),entry=dayEntry(date),plan=planForDate(date);
+ return `<button type="button" class="calendar-day ${date===selectedWorkoutDay?'selected':''} ${date===workoutToday()?'today':''} ${entry?'logged':''}" onclick="chooseWorkoutDate('${date}')"><span class="weekday">${label}</span><span class="daynum">${parseISO(date).getDate()}</span><span class="daydot"></span></button>`;
+ }).join('');
+}
+function moveWeek(n){visibleWeek=n===0?mondayOf(workoutToday()):dateShift(visibleWeek,n);if(n===0)chooseWorkoutDate(workoutToday());else renderPlan()}
+function chooseWorkoutDate(date){
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||isNaN(parseISO(date).getTime()))return;
+ selectedWorkoutDay=date;visibleWeek=mondayOf(date);
+ const d=parseISO(date);
+ document.getElementById('workoutDate').value=date;
+ document.getElementById('selectedWorkoutDate').textContent='Nhật ký · '+['Chủ nhật','Thứ 2','Thứ 3','Thứ 4','Thứ 5','Thứ 6','Thứ 7'][d.getDay()]+', '+d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear();
+ document.getElementById('workoutSelect').value=planForDate(date);
+ document.getElementById('workoutDayNote').value=dayEntry(date)?.note||'';
+ document.getElementById('selectedWorkoutStatus').textContent=dayEntry(date)?'ĐÃ LƯU':'CHƯA GHI';
+ document.getElementById('workoutSaved').textContent='';
+ renderPlan();renderExercises();
+}
+function changeWorkoutPlan(){renderExercises();document.getElementById('workoutSaved').textContent='Nhấn Lưu nhật ký ngày này để ghi thay đổi lịch tập.'}
+function extraItems(k){const entry=dayEntry(selectedWorkoutDay);return entry?.plan===k&&Array.isArray(entry.extras)?entry.extras:[]}
 function renderExercises(){
- const k=document.getElementById('workoutSelect').value;
- const p=plans[k],extras=extraItems(k);
- const fixed=p.items.map((it,i)=>`<div class="exercise"><div class="row"><b>${esc(it[0])}</b><span class="sub">${esc(it[1])}</span></div><label>Mức tạ / ghi chú</label><input data-ex="${i}" placeholder="Ví dụ: 15 kg · 10, 10, 9 reps" value="${esc(data.logs[k+'-'+i]||'')}"></div>`).join('');
- const added=extras.map((it,i)=>`<div class="exercise"><div class="row"><b>${esc(it.name)}</b><button type="button" class="ghost" style="min-height:32px;padding:6px 10px" onclick="removeExtraExercise(${i})">Xóa</button></div><div class="sub">${esc(it.sets)}</div><label>Mức tạ / ghi chú</label><input data-extra="${esc(it.id)}" placeholder="Ví dụ: 12 kg · 12, 12, 10 reps" value="${esc(data.logs[k+'-extra-'+it.id]||'')}"></div>`).join('');
+ const k=document.getElementById('workoutSelect').value,entry=dayEntry(selectedWorkoutDay);
+ document.getElementById('addExercisePanel').classList.toggle('hidden',k==='rest');
+ if(k==='rest'){document.getElementById('exerciseList').innerHTML='<p class="sub">Ngày nghỉ / phục hồi. Anh vẫn có thể ghi chú và lưu ngày này.</p>';return}
+ const p=plans[k],extras=extraItems(k),notes=entry?.plan===k?entry.exerciseNotes||{}:{};
+ const fixed=p.items.map((it,i)=>`<div class="exercise"><div class="row"><b>${esc(it[0])}</b><span class="sub">${esc(it[1])}</span></div><label>Mức tạ / ghi chú</label><input data-ex="${i}" placeholder="Ví dụ: 15 kg · 10, 10, 9 reps" value="${esc(notes['base-'+i]??data.logs[k+'-'+i]??'')}"></div>`).join('');
+ const added=extras.map((it,i)=>`<div class="exercise"><div class="row"><b>${esc(it.name)}</b><button type="button" class="ghost" style="min-height:32px;padding:6px 10px" onclick="removeExtraExercise(${i})">Xóa</button></div><div class="sub">${esc(it.sets)}</div><label>Mức tạ / ghi chú</label><input data-extra="${esc(it.id)}" placeholder="Ví dụ: 12 kg · 12, 12, 10 reps" value="${esc(notes['extra-'+it.id]||'')}"></div>`).join('');
  document.getElementById('exerciseList').innerHTML=fixed+added;
 }
 function captureExerciseNotes(){
+ const notes={};
+ document.querySelectorAll('[data-ex]').forEach(x=>notes['base-'+x.dataset.ex]=x.value);
+ document.querySelectorAll('[data-extra]').forEach(x=>notes['extra-'+x.dataset.extra]=x.value);
+ return notes;
+}
+function currentExtras(){const k=document.getElementById('workoutSelect').value,entry=dayEntry(selectedWorkoutDay);return entry?.plan===k&&Array.isArray(entry.extras)?entry.extras.map(x=>({...x})):[]}
+function persistDay(extras){
+ ensureWorkoutDays();
  const k=document.getElementById('workoutSelect').value;
- document.querySelectorAll('[data-ex]').forEach(x=>data.logs[k+'-'+x.dataset.ex]=x.value);
- document.querySelectorAll('[data-extra]').forEach(x=>data.logs[k+'-extra-'+x.dataset.extra]=x.value);
+ data.workoutDays[selectedWorkoutDay]={plan:k,note:document.getElementById('workoutDayNote').value,exerciseNotes:captureExerciseNotes(),extras:k==='rest'?[]:extras};
+ save();
 }
 function addExtraExercise(){
  const k=document.getElementById('workoutSelect').value;
- const name=document.getElementById('extraExerciseName').value.trim();
- const sets=document.getElementById('extraExerciseSets').value.trim();
+ if(k==='rest')return;
+ const name=document.getElementById('extraExerciseName').value.trim(),sets=document.getElementById('extraExerciseSets').value.trim();
  if(!name||!sets){alert('Anh nhập tên bài tập và số hiệp × reps nhé.');return}
  if(name.length>100||sets.length>80){alert('Tên bài hoặc số hiệp quá dài.');return}
- captureExerciseNotes();
- extraItems(k).push({id:Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7),name,sets});
- save();renderExercises();
- document.getElementById('extraExerciseName').value='';
- document.getElementById('extraExerciseSets').value='';
+ const extras=currentExtras();
+ extras.push({id:Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7),name,sets});
+ persistDay(extras);renderExercises();renderPlan();
+ document.getElementById('extraExerciseName').value='';document.getElementById('extraExerciseSets').value='';
+ document.getElementById('selectedWorkoutStatus').textContent='ĐÃ LƯU';
 }
 function removeExtraExercise(i){
- const k=document.getElementById('workoutSelect').value,items=extraItems(k);
- if(!items[i]||!confirm('Xóa bài tập "'+items[i].name+'" khỏi buổi này?'))return;
- captureExerciseNotes();
- const removed=items.splice(i,1)[0];delete data.logs[k+'-extra-'+removed.id];
- save();renderExercises();
+ const extras=currentExtras();if(!extras[i]||!confirm('Xóa bài tập "'+extras[i].name+'" khỏi ngày này?'))return;
+ extras.splice(i,1);persistDay(extras);renderExercises();
 }
 function saveWorkout(){
- const k=document.getElementById('workoutSelect').value;
- captureExerciseNotes();
- data.sessions.push({date:day(),key:k,name:plans[k].name,extraExercises:extraItems(k).map(x=>({name:x.name,sets:x.sets}))});
- save();document.getElementById('workoutSaved').textContent='Đã lưu buổi tập và các bài tự thêm.';renderBody();
+ const k=document.getElementById('workoutSelect').value,extras=currentExtras();
+ persistDay(extras);
+ data.sessions=data.sessions.filter(x=>x.date!==selectedWorkoutDay);
+ if(k!=='rest')data.sessions.push({date:selectedWorkoutDay,key:k,name:plans[k].name,extraExercises:extras.map(x=>({name:x.name,sets:x.sets}))});
+ save();renderPlan();renderBody();
+ document.getElementById('selectedWorkoutStatus').textContent='ĐÃ LƯU';
+ document.getElementById('workoutSaved').textContent='Đã lưu lịch và nhật ký cho ngày '+selectedWorkoutDay.split('-').reverse().join('/')+'.';
 }
 function saveBody(){let weight=Number(document.getElementById('weight').value),waist=Number(document.getElementById('waist').value),note=document.getElementById('bodyNote').value;if(!weight&&!waist){alert('Nhập ít nhất cân nặng hoặc vòng eo nhé.');return}data.body.unshift({date:day(),weight:weight||null,waist:waist||null,note});save();document.getElementById('weight').value='';document.getElementById('waist').value='';document.getElementById('bodyNote').value='';renderBody()}
 function renderBody(){document.getElementById('sessionCount').textContent=data.sessions.length;document.getElementById('bodyHistory').innerHTML=data.body.length?'<table><tr><th>Ngày</th><th>Cân nặng</th><th>Vòng eo</th></tr>'+data.body.slice(0,12).map(x=>`<tr><td>${x.date}</td><td>${x.weight??'—'} kg</td><td>${x.waist??'—'} cm</td></tr>`).join('')+'</table>':'Chưa có dữ liệu. Hãy thêm lần ghi nhận đầu tiên.'}
@@ -305,7 +362,7 @@ async function importData(event){
 }
 function resetData(){if(confirm('Xóa toàn bộ dữ liệu FITTRACK trên thiết bị này?')){localStorage.removeItem(KEY);data=load();init()}}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function init(){document.getElementById('waterGoal').value=data.goal;renderHome();renderHabits();renderPlan();renderExercises();renderBody()}
+function init(){document.getElementById('waterGoal').value=data.goal;renderHome();renderHabits();chooseWorkoutDate(selectedWorkoutDay);renderBody()}
 init();bootCloud();
 if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
 </script>
