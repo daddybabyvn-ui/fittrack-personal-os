@@ -140,7 +140,7 @@ body.theme-dark{color-scheme:dark;--bg:#080f1e;--panel:rgba(24,36,59,.58);--pane
 <div class="card"><div class="row"><h2>Lịch trong tuần</h2><span class="pill">4 DAYS</span></div><div id="weekPlan"></div></div>
 <div class="card"><div class="row"><h2>Ghi buổi tập</h2><span class="sub">Lưu lại mức tạ và reps</span></div>
 <label>Chọn buổi</label><select id="workoutSelect" onchange="renderExercises()"><option value="mon">Thứ 2 — Upper A</option><option value="tue">Thứ 3 — Lower A</option><option value="thu">Thứ 5 — Upper B</option><option value="sat">Thứ 7 — Lower B</option></select>
-<div id="exerciseList"></div><button style="width:100%;margin-top:12px" onclick="saveWorkout()">Lưu buổi tập hôm nay</button><div class="notice" id="workoutSaved" style="margin-top:8px"></div></div>
+<div id="exerciseList"></div><div class="card" style="background:var(--panel2);margin-top:14px"><h3>+ Thêm bài tập vào buổi này</h3><label>Tên bài tập</label><input id="extraExerciseName" placeholder="Ví dụ: Cable Fly"><label>Số hiệp × số reps</label><input id="extraExerciseSets" placeholder="Ví dụ: 3 × 12–15"><button type="button" class="secondary" onclick="addExtraExercise()">+ Thêm bài tập</button></div><button style="width:100%;margin-top:12px" onclick="saveWorkout()">Lưu buổi tập hôm nay</button><div class="notice" id="workoutSaved" style="margin-top:8px"></div></div>
 </section>
 
 <section class="view" id="habits">
@@ -228,8 +228,44 @@ function renderHabits(){let c=data.checks[day()]||[];document.getElementById('ha
 function toggleHabit(i,v){let c=data.checks[day()]||[];data.checks[day()]=v?[...new Set([...c,i])]:c.filter(x=>x!==i);save();renderHome();renderHabits()}
 function addHabit(){let x=document.getElementById('newHabit').value.trim();if(!x)return;data.habits.push(x);document.getElementById('newHabit').value='';save();renderHabits();renderHome()}
 function renderPlan(){document.getElementById('weekPlan').innerHTML=[['Thứ 2','mon'],['Thứ 3','tue'],['Thứ 4','rest'],['Thứ 5','thu'],['Thứ 6','rest'],['Thứ 7','sat'],['Chủ nhật','rest']].map(([d,k])=>`<div class="exercise"><div class="row"><b>${d}</b><span class="pill">${plans[k]?.name||'Nghỉ / phục hồi'}</span></div><small>${plans[k]?.desc||'Đi bộ nhẹ, nghỉ ngơi'}</small></div>`).join('')}
-function renderExercises(){let k=document.getElementById('workoutSelect').value,p=plans[k];document.getElementById('exerciseList').innerHTML=p.items.map((it,i)=>`<div class="exercise"><div class="row"><b>${it[0]}</b><span class="sub">${it[1]}</span></div><label>Mức tạ / ghi chú</label><input data-ex="${i}" placeholder="Ví dụ: 15 kg · 10, 10, 9 reps" value="${esc(data.logs[k+'-'+i]||'')}"></div>`).join('')}
-function saveWorkout(){let k=document.getElementById('workoutSelect').value,vals=[...document.querySelectorAll('[data-ex]')];vals.forEach(x=>data.logs[k+'-'+x.dataset.ex]=x.value);data.sessions.push({date:day(),key:k,name:plans[k].name});save();document.getElementById('workoutSaved').textContent='Đã lưu buổi tập trên thiết bị này.';renderBody()}
+function extraItems(k){if(!data.extraExercises||typeof data.extraExercises!=='object')data.extraExercises={};if(!Array.isArray(data.extraExercises[k]))data.extraExercises[k]=[];return data.extraExercises[k]}
+function renderExercises(){
+ const k=document.getElementById('workoutSelect').value;
+ const p=plans[k],extras=extraItems(k);
+ const fixed=p.items.map((it,i)=>`<div class="exercise"><div class="row"><b>${esc(it[0])}</b><span class="sub">${esc(it[1])}</span></div><label>Mức tạ / ghi chú</label><input data-ex="${i}" placeholder="Ví dụ: 15 kg · 10, 10, 9 reps" value="${esc(data.logs[k+'-'+i]||'')}"></div>`).join('');
+ const added=extras.map((it,i)=>`<div class="exercise"><div class="row"><b>${esc(it.name)}</b><button type="button" class="ghost" style="min-height:32px;padding:6px 10px" onclick="removeExtraExercise(${i})">Xóa</button></div><div class="sub">${esc(it.sets)}</div><label>Mức tạ / ghi chú</label><input data-extra="${esc(it.id)}" placeholder="Ví dụ: 12 kg · 12, 12, 10 reps" value="${esc(data.logs[k+'-extra-'+it.id]||'')}"></div>`).join('');
+ document.getElementById('exerciseList').innerHTML=fixed+added;
+}
+function captureExerciseNotes(){
+ const k=document.getElementById('workoutSelect').value;
+ document.querySelectorAll('[data-ex]').forEach(x=>data.logs[k+'-'+x.dataset.ex]=x.value);
+ document.querySelectorAll('[data-extra]').forEach(x=>data.logs[k+'-extra-'+x.dataset.extra]=x.value);
+}
+function addExtraExercise(){
+ const k=document.getElementById('workoutSelect').value;
+ const name=document.getElementById('extraExerciseName').value.trim();
+ const sets=document.getElementById('extraExerciseSets').value.trim();
+ if(!name||!sets){alert('Anh nhập tên bài tập và số hiệp × reps nhé.');return}
+ if(name.length>100||sets.length>80){alert('Tên bài hoặc số hiệp quá dài.');return}
+ captureExerciseNotes();
+ extraItems(k).push({id:Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7),name,sets});
+ save();renderExercises();
+ document.getElementById('extraExerciseName').value='';
+ document.getElementById('extraExerciseSets').value='';
+}
+function removeExtraExercise(i){
+ const k=document.getElementById('workoutSelect').value,items=extraItems(k);
+ if(!items[i]||!confirm('Xóa bài tập "'+items[i].name+'" khỏi buổi này?'))return;
+ captureExerciseNotes();
+ const removed=items.splice(i,1)[0];delete data.logs[k+'-extra-'+removed.id];
+ save();renderExercises();
+}
+function saveWorkout(){
+ const k=document.getElementById('workoutSelect').value;
+ captureExerciseNotes();
+ data.sessions.push({date:day(),key:k,name:plans[k].name,extraExercises:extraItems(k).map(x=>({name:x.name,sets:x.sets}))});
+ save();document.getElementById('workoutSaved').textContent='Đã lưu buổi tập và các bài tự thêm.';renderBody();
+}
 function saveBody(){let weight=Number(document.getElementById('weight').value),waist=Number(document.getElementById('waist').value),note=document.getElementById('bodyNote').value;if(!weight&&!waist){alert('Nhập ít nhất cân nặng hoặc vòng eo nhé.');return}data.body.unshift({date:day(),weight:weight||null,waist:waist||null,note});save();document.getElementById('weight').value='';document.getElementById('waist').value='';document.getElementById('bodyNote').value='';renderBody()}
 function renderBody(){document.getElementById('sessionCount').textContent=data.sessions.length;document.getElementById('bodyHistory').innerHTML=data.body.length?'<table><tr><th>Ngày</th><th>Cân nặng</th><th>Vòng eo</th></tr>'+data.body.slice(0,12).map(x=>`<tr><td>${x.date}</td><td>${x.weight??'—'} kg</td><td>${x.waist??'—'} cm</td></tr>`).join('')+'</table>':'Chưa có dữ liệu. Hãy thêm lần ghi nhận đầu tiên.'}
 function saveGoal(){let g=Number(document.getElementById('waterGoal').value);if(g<500||g>6000){alert('Hãy nhập mục tiêu từ 500 đến 6.000 ml.');return}data.goal=g;save();renderHome();alert('Đã lưu mục tiêu nước.')}
