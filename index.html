@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101114">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FITTRACK">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>FITTRACK — Personal OS</title>
+<style>
+:root{color-scheme:dark;--bg:#101114;--panel:#191b20;--panel2:#22252c;--line:#30343d;--muted:#a1a6b1;--white:#f4f5f7;--accent:#c7f36b;--danger:#ff7777}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--white);font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding-bottom:88px}
+header{padding:22px 18px 14px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#101114ed;backdrop-filter:blur(16px);z-index:3;border-bottom:1px solid #252830}
+.logo{font-weight:900;letter-spacing:2px;font-size:18px}.logo span{color:var(--accent)}.date{font-size:12px;color:var(--muted);margin-top:4px}
+main{max-width:1180px;margin:auto;padding:18px}.view{display:none}.view.active{display:block}
+h1{font-size:27px;letter-spacing:-.7px;margin:8px 0 5px}h2{font-size:18px;margin:0 0 14px}h3{font-size:15px;margin:0 0 8px}
+.sub{color:var(--muted);font-size:13px;line-height:1.5}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:15px;margin:12px 0}
+.stat{font-size:25px;font-weight:800;margin:7px 0}.accent{color:var(--accent)}.row{display:flex;justify-content:space-between;align-items:center;gap:10px}.pill{font-size:11px;color:var(--accent);background:#c7f36b18;border:1px solid #c7f36b44;border-radius:30px;padding:5px 9px}
+button,.btn{background:var(--accent);color:#14160f;border:0;border-radius:12px;padding:11px 14px;font-weight:750;font-size:13px;cursor:pointer}
+button.secondary{background:var(--panel2);color:var(--white);border:1px solid var(--line)}button.ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
+button:active{transform:scale(.98)}input,select{width:100%;background:#111318;color:var(--white);border:1px solid var(--line);border-radius:10px;padding:11px;margin:5px 0 12px;font-size:14px}
+label{display:block;color:var(--muted);font-size:12px;margin-top:10px}
+.progress{height:8px;background:#30343d;border-radius:20px;overflow:hidden;margin:10px 0}.progress i{display:block;height:100%;background:var(--accent);width:0}
+.habit{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #2a2d34}.habit:last-child{border:0}.habit input{width:19px;height:19px;accent-color:#c7f36b;margin:0}.habit span{flex:1}
+.exercise{padding:12px 0;border-bottom:1px solid #2b2e36}.exercise:last-child{border:0}.exercise small{display:block;color:var(--muted);margin-top:4px}
+.tabs{position:fixed;bottom:0;left:0;right:0;background:#17191eee;backdrop-filter:blur(18px);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:9px 4px calc(9px + env(safe-area-inset-bottom));z-index:5}
+.tabs button{background:none;color:var(--muted);padding:7px 5px;font-size:11px;flex:1;border-radius:9px}.tabs button.active{color:var(--accent);background:#c7f36b12}
+.tabs b{display:block;font-size:18px;margin-bottom:3px}.hidden{display:none!important}.muted{color:var(--muted)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{flex:1}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{text-align:left;padding:10px 5px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-weight:500}
+.notice{font-size:12px;color:var(--muted);line-height:1.5}
+@media(min-width:760px){
+ body{padding-bottom:24px;padding-left:220px}
+ header{padding:22px 32px 16px}
+ main{padding:28px 32px;max-width:1320px}
+ .tabs{left:0;right:auto;top:0;bottom:0;width:220px;display:flex;flex-direction:column;justify-content:flex-start;gap:8px;padding:110px 14px 20px;border-top:0;border-right:1px solid var(--line);background:#17191e}
+ .tabs button{display:flex;align-items:center;gap:14px;text-align:left;padding:13px 15px;font-size:14px;flex:none}
+ .tabs b{display:inline-block;font-size:19px;margin:0;width:24px;text-align:center}
+ .tabs button.active{background:#c7f36b16}
+ .grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+ .card{padding:20px;border-radius:20px;margin:16px 0}
+ h1{font-size:34px;margin-top:12px}
+ .view{max-width:1120px}
+}
+@media(min-width:1200px){main{padding:34px 48px}.grid{gap:18px}.card{padding:22px}}
+@media(max-width:420px){.grid{grid-template-columns:1fr}.card{padding:14px}h1{font-size:24px}.tabs button{font-size:10px}}
+</style>
+</head>
+<body>
+<header><div><div class="logo">FIT<span>TRACK</span></div><div class="date" id="today"></div></div><div class="pill">PERSONAL OS</div></header>
+<main>
+<section class="view active" id="home">
+<h1>Hôm nay, tập trung vào mình.</h1><div class="sub">Kỷ luật nhỏ mỗi ngày. Tiến bộ theo thời gian.</div>
+<div class="grid">
+<div class="card"><div class="sub">NƯỚC HÔM NAY</div><div class="stat"><span id="waterNum">0</span><small style="font-size:13px;color:var(--muted)"> / 2.200 ml</small></div><div class="progress"><i id="waterBar"></i></div><button onclick="addWater(250)">+ 250 ml</button></div>
+<div class="card"><div class="sub">THÓI QUEN HOÀN THÀNH</div><div class="stat" id="habitCount">0/5</div><div class="progress"><i id="habitBar"></i></div><span class="sub">Checklist trong ngày</span></div>
+</div>
+<div class="card"><div class="row"><h2>Buổi tập hôm nay</h2><span class="pill" id="todayWorkoutTag">PHỤC HỒI</span></div><h3 id="todayWorkout">Ngày nghỉ / phục hồi</h3><div class="sub" id="todayWorkoutDesc">Đi bộ nhẹ, vận động thoải mái và ngủ đủ.</div><button class="secondary" style="margin-top:12px" onclick="show('workout')">Xem lịch tập</button></div>
+<div class="card"><div class="row"><h2>Thói quen hằng ngày</h2><span class="sub" id="habitSummary">0 hoàn thành</span></div><div id="homeHabits"></div></div>
+<div class="card"><h2>Ghi nhớ hôm nay</h2><div class="sub">• Ưu tiên kỹ thuật đúng khi tập.<br>• Uống nước đều trong ngày, không cố uống dồn.<br>• Ngủ khoảng 7–9 giờ nếu có thể.</div></div>
+</section>
+
+<section class="view" id="workout">
+<h1>Workout</h1><div class="sub">Lịch Aesthetic 4 buổi/tuần · 90 phút/buổi</div>
+<div class="card"><div class="row"><h2>Lịch trong tuần</h2><span class="pill">4 DAYS</span></div><div id="weekPlan"></div></div>
+<div class="card"><div class="row"><h2>Ghi buổi tập</h2><span class="sub">Lưu lại mức tạ và reps</span></div>
+<label>Chọn buổi</label><select id="workoutSelect" onchange="renderExercises()"><option value="mon">Thứ 2 — Upper A</option><option value="tue">Thứ 3 — Lower A</option><option value="thu">Thứ 5 — Upper B</option><option value="sat">Thứ 7 — Lower B</option></select>
+<div id="exerciseList"></div><button style="width:100%;margin-top:12px" onclick="saveWorkout()">Lưu buổi tập hôm nay</button><div class="notice" id="workoutSaved" style="margin-top:8px"></div></div>
+</section>
+
+<section class="view" id="habits">
+<h1>Daily habits</h1><div class="sub">Đánh dấu những việc bạn đã hoàn thành hôm nay.</div>
+<div class="card"><div class="row"><h2>Checklist</h2><span class="pill" id="habitPct">0%</span></div><div id="habitList"></div></div>
+<div class="card"><h2>Thêm thói quen</h2><label>Tên thói quen</label><input id="newHabit" placeholder="Ví dụ: Đọc sách 20 phút"><button onclick="addHabit()">Thêm thói quen</button></div>
+</section>
+
+<section class="view" id="progress">
+<h1>Body progress</h1><div class="sub">Theo dõi thay đổi bằng dữ liệu, không chỉ bằng cảm giác.</div>
+<div class="card"><h2>Ghi nhận chỉ số</h2>
+<label>Cân nặng (kg)</label><input id="weight" type="number" step=".1" placeholder="Ví dụ: 63">
+<label>Vòng eo (cm)</label><input id="waist" type="number" step=".5" placeholder="Ví dụ: 76">
+<label>Ghi chú</label><input id="bodyNote" placeholder="Cảm nhận / ảnh tiến độ...">
+<button onclick="saveBody()">Lưu chỉ số</button></div>
+<div class="card"><h2>Lịch sử gần đây</h2><div id="bodyHistory" class="sub">Chưa có dữ liệu. Hãy thêm lần ghi nhận đầu tiên.</div></div>
+<div class="card"><h2>Thống kê tập luyện</h2><div class="stat" id="sessionCount">0</div><div class="sub">Buổi tập đã lưu trên thiết bị này</div></div>
+</section>
+
+<section class="view" id="settings">
+<h1>Cài đặt</h1><div class="sub">Thiết lập mục tiêu cá nhân.</div>
+<div class="card"><div class="row"><h2>Tài khoản & đồng bộ</h2><span class="pill" id="authStatus">CHƯA KẾT NỐI</span></div>
+<div class="sub" id="authMessage">Kết nối Supabase để đăng ký tài khoản và đồng bộ dữ liệu giữa các thiết bị.</div>
+<label>Supabase Project URL</label><input id="sbUrl" type="url" placeholder="https://xxxxx.supabase.co">
+<label>Supabase Anon / Publishable key</label><input id="sbKey" type="text" placeholder="sb_publishable_... hoặc anon key">
+<button class="secondary" onclick="connectCloud()">Lưu cấu hình kết nối</button>
+<div id="accountArea" class="hidden">
+<label>Email</label><input id="authEmail" type="email" autocomplete="email" placeholder="email@example.com">
+<label>Mật khẩu</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="Ít nhất 8 ký tự">
+<div class="actions"><button onclick="signUp()">Tạo tài khoản</button><button class="secondary" onclick="signIn()">Đăng nhập</button></div>
+<div class="actions" style="margin-top:8px"><button class="secondary" onclick="syncNow()">Đồng bộ ngay</button><button class="ghost" onclick="signOut()">Đăng xuất</button></div>
+</div><div class="notice" style="margin-top:10px">Chỉ dùng khóa công khai (anon/publishable key), không bao giờ dán Service Role key vào website.</div></div>
+<div class="card"><h2>Mục tiêu nước</h2><label>Lượng nước mục tiêu (ml)</label><input id="waterGoal" type="number" value="2200"><button onclick="saveGoal()">Lưu mục tiêu</button></div>
+<div class="card"><h2>Dữ liệu</h2><div class="sub">Phiên bản hiện tại lưu dữ liệu trên thiết bị/trình duyệt này. Dữ liệu chưa tự đồng bộ giữa iPhone và máy tính.</div><div class="actions" style="margin-top:12px"><button class="secondary" onclick="exportData()">Xuất bản sao lưu</button><button class="ghost" onclick="resetData()">Xóa dữ liệu</button></div></div>
+<div class="card"><h2>Cài lên iPhone</h2><div class="sub">Đưa website lên hosting HTTPS, mở bằng Safari → Chia sẻ → Thêm vào MH chính. Sau đó có thể mở từ biểu tượng FITTRACK.</div></div>
+</section>
+</main>
+<nav class="tabs">
+<button class="active" data-view="home" onclick="show('home')"><b>⌂</b>Home</button>
+<button data-view="workout" onclick="show('workout')"><b>＋</b>Workout</button>
+<button data-view="habits" onclick="show('habits')"><b>✓</b>Habits</button>
+<button data-view="progress" onclick="show('progress')"><b>↗</b>Progress</button>
+<button data-view="settings" onclick="show('settings')"><b>⚙</b>Settings</button>
+</nav>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const KEY='fittrack-v1';
+const CFG='fittrack-supabase-config';
+let sb=null, authUser=null, syncing=false;
+const defaults={goal:2200,water:{},habits:['Uống đủ nước','Tập luyện hoặc vận động nhẹ','Ăn đủ protein','Học tập / phát triển kỹ năng','Ngủ đúng giờ'],checks:{},body:[],sessions:[],logs:{}};
+let data=load();
+function load(){try{return {...defaults,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){return structuredClone(defaults)}}
+function save(){data._updatedAt=Date.now();localStorage.setItem(KEY,JSON.stringify(data));if(authUser&&!syncing)pushCloud().catch(e=>setAuthMessage('Chưa đồng bộ được: '+e.message))}
+function setAuthMessage(t){const el=document.getElementById('authMessage');if(el)el.textContent=t}
+function setAuthUI(){const cfg=JSON.parse(localStorage.getItem(CFG)||'{}');document.getElementById('sbUrl').value=cfg.url||'';document.getElementById('sbKey').value=cfg.key||'';document.getElementById('accountArea').classList.toggle('hidden',!sb);document.getElementById('authStatus').textContent=authUser?'ĐÃ ĐĂNG NHẬP':(sb?'SẴN SÀNG':'CHƯA KẾT NỐI');if(authUser)setAuthMessage('Đang đăng nhập: '+authUser.email+' · Dữ liệu sẽ được đồng bộ lên cloud.');else if(sb)setAuthMessage('Đã kết nối Supabase. Hãy đăng ký hoặc đăng nhập tài khoản của bạn.');}
+function connectCloud(){const url=document.getElementById('sbUrl').value.trim(),key=document.getElementById('sbKey').value.trim();if(!url||!key){alert('Nhập Project URL và khóa anon/publishable trước nhé.');return}try{const u=new URL(url);if(u.protocol!=='https:')throw new Error();localStorage.setItem(CFG,JSON.stringify({url,key}));sb=window.supabase.createClient(url,key);sb.auth.getSession().then(({data,error})=>{if(error)throw error;authUser=data.session?.user||null;setAuthUI();if(authUser)syncNow()}).catch(e=>setAuthMessage('Lỗi kết nối: '+e.message));setAuthUI()}catch(e){alert('Project URL chưa hợp lệ hoặc thư viện kết nối chưa tải xong. Hãy kiểm tra mạng và thử lại.')}}
+async function signUp(){if(!sb)return alert('Hãy kết nối Supabase trước.');const email=document.getElementById('authEmail').value.trim(),password=document.getElementById('authPassword').value;if(!email||password.length<8)return alert('Nhập email hợp lệ và mật khẩu tối thiểu 8 ký tự.');const {data:res,error}=await sb.auth.signUp({email,password});if(error)return setAuthMessage('Không tạo được tài khoản: '+error.message);authUser=res.user;if(res.session){setAuthUI();await syncNow()}else setAuthMessage('Đã gửi email xác nhận đến '+email+'. Mở email để xác nhận, sau đó quay lại đăng nhập.');}
+async function signIn(){if(!sb)return alert('Hãy kết nối Supabase trước.');const email=document.getElementById('authEmail').value.trim(),password=document.getElementById('authPassword').value;const {data:res,error}=await sb.auth.signInWithPassword({email,password});if(error)return setAuthMessage('Đăng nhập thất bại: '+error.message);authUser=res.user;setAuthUI();await syncNow()}
+async function signOut(){if(!sb)return;const {error}=await sb.auth.signOut();if(error)return setAuthMessage(error.message);authUser=null;setAuthUI();setAuthMessage('Đã đăng xuất. Dữ liệu hiện có vẫn còn trên thiết bị này.')}
+async function pushCloud(){if(!sb||!authUser)return;const payload={...data};const {error}=await sb.from('fittrack_data').upsert({user_id:authUser.id,payload,updated_at:new Date().toISOString()},{onConflict:'user_id'});if(error)throw error;setAuthMessage('Đã đồng bộ dữ liệu lên cloud · '+new Date().toLocaleTimeString('vi-VN'))}
+async function syncNow(){if(!sb||!authUser)return;syncing=true;setAuthMessage('Đang kiểm tra dữ liệu cloud...');try{const {data:row,error}=await sb.from('fittrack_data').select('payload').eq('user_id',authUser.id).maybeSingle();if(error)throw error;if(row?.payload){const remote=row.payload;const localTime=Number(data._updatedAt||0),remoteTime=Number(remote._updatedAt||0);if(remoteTime>localTime){data={...defaults,...remote};localStorage.setItem(KEY,JSON.stringify(data));init()}else{await pushCloud()}}else{await pushCloud()}setAuthMessage('Đồng bộ hoàn tất · '+authUser.email)}catch(e){setAuthMessage('Lỗi đồng bộ: '+e.message+' · Kiểm tra bảng và chính sách SQL.')}finally{syncing=false}}
+function bootCloud(){const cfg=JSON.parse(localStorage.getItem(CFG)||'{}');if(cfg.url&&cfg.key&&window.supabase){sb=window.supabase.createClient(cfg.url,cfg.key);sb.auth.getSession().then(({data,error})=>{if(!error){authUser=data.session?.user||null;setAuthUI();if(authUser)syncNow()}});sb.auth.onAuthStateChange((_event,session)=>{authUser=session?.user||null;setAuthUI()})}setAuthUI()}
+function day(){let d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function dayLabel(){return new Date().toLocaleDateString('vi-VN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
+function show(id){document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('active',x.dataset.view===id));if(id==='workout')renderExercises();if(id==='progress')renderBody()}
+const plans={
+mon:{name:'Upper A',desc:'Ngực trên · Vai ngang · Lưng xô',items:[['Incline Chest Press Machine','3 × 8–12'],['Lat Pulldown','3 × 8–12'],['Chest Press Machine','2 × 10–12'],['Seated Cable Row','2 × 10–12'],['Dumbbell Lateral Raise','3 × 12–15'],['Reverse Pec Deck','2 × 12–15'],['Triceps Rope Pushdown','2 × 10–15']]},
+tue:{name:'Lower A + Core',desc:'Chân · Mông · Bụng',items:[['Leg Press','3 × 10–12'],['Romanian Deadlift','3 × 8–12'],['Seated Leg Curl','3 × 10–15'],['Leg Extension','2 × 12–15'],['Standing Calf Raise','3 × 12–15'],['Cable Crunch','3 × 10–15'],['Plank','3 × 30–45 giây']]},
+thu:{name:'Upper B',desc:'Độ rộng lưng · Vai sau · Tay',items:[['Assisted Pull-up / Lat Pulldown','3 × 8–12'],['Chest-Supported Row','3 × 8–12'],['Incline Dumbbell Press','3 × 8–12'],['Cable Lateral Raise','3 × 12–15'],['Reverse Pec Deck','3 × 12–15'],['Dumbbell Biceps Curl','2 × 10–15'],['Rope Triceps Pushdown','2 × 10–15']]},
+sat:{name:'Lower B + Core',desc:'Chân · Mông · Core',items:[['Hack Squat / Goblet Squat','3 × 8–12'],['Hip Thrust','3 × 10–12'],['Seated Leg Curl','3 × 10–15'],['Supported Bulgarian Split Squat','2 × 8–10 mỗi chân'],['Calf Raise','3 × 12–15'],['Hanging Knee Raise / Reverse Crunch','3 × 10–15'],['Đi bộ dốc nhẹ','10–15 phút']]}}
+const dayKey=['sun','mon','tue','wed','thu','fri','sat'][new Date().getDay()];
+function renderHome(){
+document.getElementById('today').textContent=dayLabel();
+let w=data.water[day()]||0;document.getElementById('waterNum').textContent=w.toLocaleString('vi-VN');document.getElementById('waterBar').style.width=Math.min(100,w/data.goal*100)+'%';
+let checks=data.checks[day()]||[];document.getElementById('habitCount').textContent=checks.length+'/'+data.habits.length;document.getElementById('habitBar').style.width=(checks.length/Math.max(1,data.habits.length)*100)+'%';document.getElementById('habitSummary').textContent=checks.length+' hoàn thành';
+let p=plans[dayKey];document.getElementById('todayWorkout').textContent=p?p.name:'Ngày nghỉ / phục hồi';document.getElementById('todayWorkoutDesc').textContent=p?p.desc:'Đi bộ nhẹ, vận động thoải mái và ngủ đủ.';document.getElementById('todayWorkoutTag').textContent=p?'GYM DAY':'RECOVERY';
+document.getElementById('homeHabits').innerHTML=data.habits.slice(0,5).map((h,i)=>`<div class="habit"><input type="checkbox" ${checks.includes(i)?'checked':''} onchange="toggleHabit(${i},this.checked)"><span>${esc(h)}</span></div>`).join('');
+}
+function addWater(n){data.water[day()]=(data.water[day()]||0)+n;save();renderHome()}
+function renderHabits(){let c=data.checks[day()]||[];document.getElementById('habitPct').textContent=Math.round(c.length/Math.max(1,data.habits.length)*100)+'%';document.getElementById('habitList').innerHTML=data.habits.map((h,i)=>`<div class="habit"><input type="checkbox" ${c.includes(i)?'checked':''} onchange="toggleHabit(${i},this.checked)"><span>${esc(h)}</span></div>`).join('');}
+function toggleHabit(i,v){let c=data.checks[day()]||[];data.checks[day()]=v?[...new Set([...c,i])]:c.filter(x=>x!==i);save();renderHome();renderHabits()}
+function addHabit(){let x=document.getElementById('newHabit').value.trim();if(!x)return;data.habits.push(x);document.getElementById('newHabit').value='';save();renderHabits();renderHome()}
+function renderPlan(){document.getElementById('weekPlan').innerHTML=[['Thứ 2','mon'],['Thứ 3','tue'],['Thứ 4','rest'],['Thứ 5','thu'],['Thứ 6','rest'],['Thứ 7','sat'],['Chủ nhật','rest']].map(([d,k])=>`<div class="exercise"><div class="row"><b>${d}</b><span class="pill">${plans[k]?.name||'Nghỉ / phục hồi'}</span></div><small>${plans[k]?.desc||'Đi bộ nhẹ, nghỉ ngơi'}</small></div>`).join('')}
+function renderExercises(){let k=document.getElementById('workoutSelect').value,p=plans[k];document.getElementById('exerciseList').innerHTML=p.items.map((it,i)=>`<div class="exercise"><div class="row"><b>${it[0]}</b><span class="sub">${it[1]}</span></div><label>Mức tạ / ghi chú</label><input data-ex="${i}" placeholder="Ví dụ: 15 kg · 10, 10, 9 reps" value="${esc(data.logs[k+'-'+i]||'')}"></div>`).join('')}
+function saveWorkout(){let k=document.getElementById('workoutSelect').value,vals=[...document.querySelectorAll('[data-ex]')];vals.forEach(x=>data.logs[k+'-'+x.dataset.ex]=x.value);data.sessions.push({date:day(),key:k,name:plans[k].name});save();document.getElementById('workoutSaved').textContent='Đã lưu buổi tập trên thiết bị này.';renderBody()}
+function saveBody(){let weight=Number(document.getElementById('weight').value),waist=Number(document.getElementById('waist').value),note=document.getElementById('bodyNote').value;if(!weight&&!waist){alert('Nhập ít nhất cân nặng hoặc vòng eo nhé.');return}data.body.unshift({date:day(),weight:weight||null,waist:waist||null,note});save();document.getElementById('weight').value='';document.getElementById('waist').value='';document.getElementById('bodyNote').value='';renderBody()}
+function renderBody(){document.getElementById('sessionCount').textContent=data.sessions.length;document.getElementById('bodyHistory').innerHTML=data.body.length?'<table><tr><th>Ngày</th><th>Cân nặng</th><th>Vòng eo</th></tr>'+data.body.slice(0,12).map(x=>`<tr><td>${x.date}</td><td>${x.weight??'—'} kg</td><td>${x.waist??'—'} cm</td></tr>`).join('')+'</table>':'Chưa có dữ liệu. Hãy thêm lần ghi nhận đầu tiên.'}
+function saveGoal(){let g=Number(document.getElementById('waterGoal').value);if(g<500||g>6000){alert('Hãy nhập mục tiêu từ 500 đến 6.000 ml.');return}data.goal=g;save();renderHome();alert('Đã lưu mục tiêu nước.')}
+function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='fittrack-backup.json';a.click();URL.revokeObjectURL(a.href)}
+function resetData(){if(confirm('Xóa toàn bộ dữ liệu FITTRACK trên thiết bị này?')){localStorage.removeItem(KEY);data=load();init()}}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function init(){document.getElementById('waterGoal').value=data.goal;renderHome();renderHabits();renderPlan();renderExercises();renderBody()}
+init();bootCloud();
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body></html>

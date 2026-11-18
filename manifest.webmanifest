@@ -1,0 +1,9 @@
+{
+  "name": "FITTRACK — Personal OS",
+  "short_name": "FITTRACK",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#101114",
+  "theme_color": "#101114",
+  "description": "Theo dõi tập luyện, nước uống, thói quen và tiến độ hình thể."
+}
