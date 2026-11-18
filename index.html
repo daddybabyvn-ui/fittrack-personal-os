@@ -134,7 +134,7 @@ textarea{width:100%;background:#f6f8fc;color:#24344d;border:1px solid #e6eaf1;bo
 </style>
 </head>
 <body>
-<header><div><div class="logo">FIT<span>TRACK</span></div><div class="date" id="today"></div></div><div class="header-actions"><div class="pill">v0.2.0</div><button class="theme-switch" id="themeToggle" type="button" onclick="toggleTheme()" aria-label="Chuyển giao diện sáng tối">☀️ Sáng</button></div></header>
+<header><div><div class="logo">FIT<span>TRACK</span></div><div class="date" id="today"></div></div><div class="header-actions"><div class="pill">v0.2.1</div><button class="theme-switch" id="themeToggle" type="button" onclick="toggleTheme()" aria-label="Chuyển giao diện sáng tối">☀️ Sáng</button></div></header>
 <main>
 <section class="view active" id="home">
 <h1>Hôm nay, tập trung vào mình.</h1><div class="sub">Kỷ luật nhỏ mỗi ngày. Tiến bộ theo thời gian.</div>
@@ -177,7 +177,7 @@ textarea{width:100%;background:#f6f8fc;color:#24344d;border:1px solid #e6eaf1;bo
 </section>
 
 <section class="view" id="settings">
-<h1>Cài đặt</h1><div class="sub">Thiết lập mục tiêu cá nhân.</div><div class="card"><div class="row"><div><h2 style="margin-bottom:5px">FITTRACK v0.2.0</h2><div class="sub">Lịch tháng và thống kê tập luyện · 18/11/2026</div></div><span class="pill" id="networkStatus">ĐANG KIỂM TRA</span></div><div class="sub">Dark Liquid Glass · Lịch tập 7 ngày · Nhật ký theo ngày · Sao lưu JSON · Đồng bộ tài khoản.</div><button type="button" class="secondary" style="margin-top:12px" onclick="checkAppUpdate()">Kiểm tra cập nhật ứng dụng</button><div id="appUpdateStatus" class="notice" role="status" style="margin-top:8px"></div></div>
+<h1>Cài đặt</h1><div class="sub">Thiết lập mục tiêu cá nhân.</div><div class="card"><div class="row"><div><h2 style="margin-bottom:5px">FITTRACK v0.2.1</h2><div class="sub">Lịch tháng và thống kê tập luyện · 18/11/2026</div></div><span class="pill" id="networkStatus">ĐANG KIỂM TRA</span></div><div class="sub">Dark Liquid Glass · Lịch tháng · Biểu đồ mức tạ · Sao lưu JSON · Đồng bộ có xác nhận khi dữ liệu khác nhau.</div><button type="button" class="secondary" style="margin-top:12px" onclick="checkAppUpdate()">Kiểm tra cập nhật ứng dụng</button><div id="appUpdateStatus" class="notice" role="status" style="margin-top:8px"></div></div>
 <div class="card"><div class="row"><h2>Tài khoản & đồng bộ</h2><span class="pill" id="authStatus">CHƯA KẾT NỐI</span></div>
 <div class="sub" id="authMessage">Kết nối Supabase để đăng ký tài khoản và đồng bộ dữ liệu giữa các thiết bị.</div>
 <label>Supabase Project URL</label><input id="sbUrl" type="url" placeholder="https://xxxxx.supabase.co">
@@ -190,7 +190,7 @@ textarea{width:100%;background:#f6f8fc;color:#24344d;border:1px solid #e6eaf1;bo
 <div class="actions" style="margin-top:8px"><button class="secondary" onclick="syncNow()">Đồng bộ ngay</button><button class="ghost" onclick="signOut()">Đăng xuất</button></div>
 </div><div class="notice" style="margin-top:10px">Chỉ dùng khóa công khai (anon/publishable key), không bao giờ dán Service Role key vào website.</div></div>
 <div class="card"><h2>Mục tiêu nước</h2><label>Lượng nước mục tiêu (ml)</label><input id="waterGoal" type="number" value="2200"><button onclick="saveGoal()">Lưu mục tiêu</button></div>
-<div class="card"><h2>Sao lưu & khôi phục dữ liệu</h2><div class="sub">Xuất dữ liệu tập luyện, nước uống, thói quen và chỉ số cơ thể ra file JSON. Giữ file ở nơi an toàn. Khi khôi phục, dữ liệu hiện tại sẽ được thay thế sau khi anh xác nhận.</div><div class="actions" style="margin-top:12px"><button class="secondary" onclick="exportData()">⬇ Xuất bản sao lưu JSON</button><button class="secondary" onclick="document.getElementById('backupFile').click()">⬆ Khôi phục từ file JSON</button><button class="ghost" onclick="resetData()">Xóa dữ liệu</button></div><input id="backupFile" type="file" accept=".json,application/json" class="hidden" onchange="importData(event)"><div class="sub" id="backupStatus" role="status" style="margin-top:10px">Nên sao lưu định kỳ và trước khi đổi thiết bị.</div></div>
+<div class="card"><h2>Sao lưu & khôi phục dữ liệu</h2><div class="sub">Ứng dụng tự giữ một bản khôi phục gần nhất trên thiết bị khi lưu thay đổi. Bản này không thay thế việc xuất file JSON định kỳ.</div><button type="button" class="secondary" style="margin-top:10px" onclick="restoreRecovery()">Khôi phục bản tự lưu gần nhất</button><div class="sub">Xuất dữ liệu tập luyện, nước uống, thói quen và chỉ số cơ thể ra file JSON. Giữ file ở nơi an toàn. Khi khôi phục, dữ liệu hiện tại sẽ được thay thế sau khi anh xác nhận.</div><div class="actions" style="margin-top:12px"><button class="secondary" onclick="exportData()">⬇ Xuất bản sao lưu JSON</button><button class="secondary" onclick="document.getElementById('backupFile').click()">⬆ Khôi phục từ file JSON</button><button class="ghost" onclick="resetData()">Xóa dữ liệu</button></div><input id="backupFile" type="file" accept=".json,application/json" class="hidden" onchange="importData(event)"><div class="sub" id="backupStatus" role="status" style="margin-top:10px">Nên sao lưu định kỳ và trước khi đổi thiết bị.</div></div>
 <div class="card"><h2>Cài lên iPhone</h2><div class="sub">Đưa website lên hosting HTTPS, mở bằng Safari → Chia sẻ → Thêm vào MH chính. Sau đó có thể mở từ biểu tượng FITTRACK.</div></div>
 </section>
 </main>
@@ -203,31 +203,58 @@ textarea{width:100%;background:#f6f8fc;color:#24344d;border:1px solid #e6eaf1;bo
 </nav>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const APP_VERSION='0.2.0';
+const APP_VERSION='0.2.1';
 const THEME_KEY='fittrack-theme';
 function applyTheme(mode){const dark=mode==='dark';document.body.classList.toggle('theme-dark',dark);const b=document.getElementById('themeToggle');if(b){b.textContent=dark?'☀️ Sáng':'🌙 Tối';b.setAttribute('aria-label',dark?'Chuyển sang chế độ sáng':'Chuyển sang chế độ tối')}document.querySelector('meta[name="theme-color"]').setAttribute('content',dark?'#0a1427':'#f3f5f9')}
 function toggleTheme(){const next=document.body.classList.contains('theme-dark')?'light':'dark';localStorage.setItem(THEME_KEY,next);applyTheme(next)}
 applyTheme(localStorage.getItem(THEME_KEY)||'dark');
 const KEY='fittrack-v1';
 const CFG='fittrack-supabase-config';
-let sb=null, authUser=null, syncing=false;
+let sb=null, authUser=null, syncing=false, syncTimer=null, syncPromise=null;
 const defaults={goal:2200,water:{},habits:['Uống đủ nước','Tập luyện hoặc vận động nhẹ','Ăn đủ protein','Học tập / phát triển kỹ năng','Ngủ đúng giờ'],checks:{},body:[],sessions:[],logs:{}};
 let data=load();
 function load(){try{return {...defaults,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){return structuredClone(defaults)}}
-function save(){data._updatedAt=Date.now();localStorage.setItem(KEY,JSON.stringify(data));if(authUser&&!syncing)pushCloud().catch(e=>setAuthMessage('Chưa đồng bộ được: '+e.message))}
+function save(){data._updatedAt=Date.now();localStorage.setItem(KEY,JSON.stringify(data));try{localStorage.setItem('fittrack-recovery',JSON.stringify({savedAt:Date.now(),data}))}catch(e){}scheduleSync()}
+function scheduleSync(){if(!authUser||!sb)return;clearTimeout(syncTimer);if(!navigator.onLine){setAuthMessage('Đang ngoại tuyến · Dữ liệu đã lưu trên thiết bị, sẽ đồng bộ khi có mạng.');return}syncTimer=setTimeout(()=>syncNow(),1100)}
 function setAuthMessage(t){const el=document.getElementById('authMessage');if(el)el.textContent=t}
 function setAuthUI(){const cfg=JSON.parse(localStorage.getItem(CFG)||'{}');document.getElementById('sbUrl').value=cfg.url||'';document.getElementById('sbKey').value=cfg.key||'';document.getElementById('accountArea').classList.toggle('hidden',!sb);document.getElementById('authStatus').textContent=authUser?'ĐÃ ĐĂNG NHẬP':(sb?'SẴN SÀNG':'CHƯA KẾT NỐI');if(authUser)setAuthMessage('Đang đăng nhập: '+authUser.email+' · Dữ liệu sẽ được đồng bộ lên cloud.');else if(sb)setAuthMessage('Đã kết nối Supabase. Hãy đăng ký hoặc đăng nhập tài khoản của bạn.');}
 function connectCloud(){const url=document.getElementById('sbUrl').value.trim(),key=document.getElementById('sbKey').value.trim();if(!url||!key){alert('Nhập Project URL và khóa anon/publishable trước nhé.');return}try{const u=new URL(url);if(u.protocol!=='https:')throw new Error();localStorage.setItem(CFG,JSON.stringify({url,key}));sb=window.supabase.createClient(url,key);sb.auth.getSession().then(({data,error})=>{if(error)throw error;authUser=data.session?.user||null;setAuthUI();if(authUser)syncNow()}).catch(e=>setAuthMessage('Lỗi kết nối: '+e.message));setAuthUI()}catch(e){alert('Project URL chưa hợp lệ hoặc thư viện kết nối chưa tải xong. Hãy kiểm tra mạng và thử lại.')}}
 async function signUp(){if(!sb)return alert('Hãy kết nối Supabase trước.');const email=document.getElementById('authEmail').value.trim(),password=document.getElementById('authPassword').value;if(!email||password.length<8)return alert('Nhập email hợp lệ và mật khẩu tối thiểu 8 ký tự.');const {data:res,error}=await sb.auth.signUp({email,password});if(error)return setAuthMessage('Không tạo được tài khoản: '+error.message);authUser=res.user;if(res.session){setAuthUI();await syncNow()}else setAuthMessage('Đã gửi email xác nhận đến '+email+'. Mở email để xác nhận, sau đó quay lại đăng nhập.');}
 async function signIn(){if(!sb)return alert('Hãy kết nối Supabase trước.');const email=document.getElementById('authEmail').value.trim(),password=document.getElementById('authPassword').value;const {data:res,error}=await sb.auth.signInWithPassword({email,password});if(error)return setAuthMessage('Đăng nhập thất bại: '+error.message);authUser=res.user;setAuthUI();await syncNow()}
 async function signOut(){if(!sb)return;const {error}=await sb.auth.signOut();if(error)return setAuthMessage(error.message);authUser=null;setAuthUI();setAuthMessage('Đã đăng xuất. Dữ liệu hiện có vẫn còn trên thiết bị này.')}
-async function pushCloud(){if(!sb||!authUser)return;const payload={...data};const {error}=await sb.from('fittrack_data').upsert({user_id:authUser.id,payload,updated_at:new Date().toISOString()},{onConflict:'user_id'});if(error)throw error;setAuthMessage('Đã đồng bộ dữ liệu lên cloud · '+new Date().toLocaleTimeString('vi-VN'))}
-async function syncNow(){if(!sb||!authUser)return;syncing=true;setAuthMessage('Đang kiểm tra dữ liệu cloud...');try{const {data:row,error}=await sb.from('fittrack_data').select('payload').eq('user_id',authUser.id).maybeSingle();if(error)throw error;if(row?.payload){const remote=row.payload;const localTime=Number(data._updatedAt||0),remoteTime=Number(remote._updatedAt||0);if(remoteTime>localTime){data={...defaults,...remote};localStorage.setItem(KEY,JSON.stringify(data));init()}else{await pushCloud()}}else{await pushCloud()}setAuthMessage('Đồng bộ hoàn tất · '+authUser.email)}catch(e){setAuthMessage('Lỗi đồng bộ: '+e.message+' · Kiểm tra bảng và chính sách SQL.')}finally{syncing=false}}
+async function pushCloud(){if(!sb||!authUser)return;const payload=structuredClone(data);const {error}=await sb.from('fittrack_data').upsert({user_id:authUser.id,payload,updated_at:new Date().toISOString()},{onConflict:'user_id'});if(error)throw error;setAuthMessage('Đã đồng bộ lên cloud · '+new Date().toLocaleTimeString('vi-VN'))}
+async function syncNow(){
+ if(!sb||!authUser)return;
+ if(!navigator.onLine){setAuthMessage('Ngoại tuyến · Dữ liệu vẫn lưu trên thiết bị.');return}
+ if(syncPromise)return syncPromise;
+ clearTimeout(syncTimer);syncing=true;
+ syncPromise=(async()=>{setAuthMessage('Đang kiểm tra dữ liệu cloud...');
+ try{
+  const {data:row,error}=await sb.from('fittrack_data').select('payload').eq('user_id',authUser.id).maybeSingle();if(error)throw error;
+  const remote=row?.payload;
+  if(remote){
+   const localTime=Number(data._updatedAt||0),remoteTime=Number(remote._updatedAt||0);
+   if(remoteTime>localTime){
+    if(localTime&&JSON.stringify({...data,_updatedAt:0})!==JSON.stringify({...remote,_updatedAt:0})){
+     if(!confirm('Dữ liệu cloud mới hơn thiết bị này. Tải dữ liệu cloud sẽ thay thế bản hiện tại. Anh có muốn tải bản cloud không?')){setAuthMessage('Đã giữ dữ liệu trên thiết bị. Chưa ghi đè cloud.');return}
+    }
+    data={...structuredClone(defaults),...remote};localStorage.setItem(KEY,JSON.stringify(data));init();
+   }else if(localTime>remoteTime){
+    if(!confirm('Thiết bị này có dữ liệu mới hơn cloud. Anh muốn cập nhật dữ liệu thiết bị lên cloud không?')){setAuthMessage('Chưa thay đổi dữ liệu cloud. Dữ liệu thiết bị vẫn được giữ.');return}
+    await pushCloud();
+   }
+  }else await pushCloud();
+  setAuthMessage('Đồng bộ hoàn tất · '+authUser.email);
+ }catch(e){setAuthMessage('Chưa đồng bộ được: '+e.message+' · Dữ liệu vẫn lưu trên thiết bị.')}
+ finally{syncing=false}
+ })();
+ try{return await syncPromise}finally{syncPromise=null;if(Number(data._updatedAt||0)>0&&navigator.onLine&&authUser)updateNetworkStatus()}
+}
 function bootCloud(){const cfg=JSON.parse(localStorage.getItem(CFG)||'{}');if(cfg.url&&cfg.key&&window.supabase){sb=window.supabase.createClient(cfg.url,cfg.key);sb.auth.getSession().then(({data,error})=>{if(!error){authUser=data.session?.user||null;setAuthUI();if(authUser)syncNow()}});sb.auth.onAuthStateChange((_event,session)=>{authUser=session?.user||null;setAuthUI()})}setAuthUI()}
 function day(){let d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function dayLabel(){return new Date().toLocaleDateString('vi-VN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
 function updateNetworkStatus(){const el=document.getElementById('networkStatus');if(el)el.textContent=navigator.onLine?'TRỰC TUYẾN':'NGOẠI TUYẾN'}
-window.addEventListener('online',updateNetworkStatus);window.addEventListener('offline',updateNetworkStatus);
+window.addEventListener('online',()=>{updateNetworkStatus();if(authUser)syncNow()});window.addEventListener('offline',updateNetworkStatus);
 async function checkAppUpdate(){const el=document.getElementById('appUpdateStatus');el.textContent='Đang kiểm tra phiên bản mới...';try{if('serviceWorker' in navigator){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update()}const response=await fetch('./index.html?version-check='+Date.now(),{cache:'no-store'});if(!response.ok)throw Error('Không tải được phiên bản từ máy chủ');const html=await response.text();const m=html.match(/const APP_VERSION='([^']+)'/);if(m&&m[1]!==APP_VERSION){el.textContent='Có phiên bản mới '+m[1]+'. Hãy đóng và mở lại ứng dụng.';return}el.textContent='Anh đang dùng FITTRACK v'+APP_VERSION+' mới nhất trên máy chủ.'}catch(e){el.textContent='Chưa kiểm tra được cập nhật. Kiểm tra kết nối mạng và thử lại.'}}
 function show(id){document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('active',x.dataset.view===id));if(id==='workout')renderExercises();if(id==='progress'){renderBody();renderExerciseTrend()}}
 const plans={
@@ -369,6 +396,7 @@ async function importData(event){
   }catch(e){status.textContent='Không thể khôi phục: '+e.message;alert(status.textContent)}
   finally{input.value=''}
 }
+function restoreRecovery(){try{const backup=JSON.parse(localStorage.getItem('fittrack-recovery')||'null');if(!backup?.data||!Array.isArray(backup.data.sessions)||!Array.isArray(backup.data.habits))throw Error('Chưa có bản tự lưu hợp lệ');if(!confirm('Khôi phục bản tự lưu sẽ thay thế dữ liệu hiện tại trên thiết bị. Tiếp tục?'))return;data={...structuredClone(defaults),...backup.data,_updatedAt:Date.now()};localStorage.setItem(KEY,JSON.stringify(data));init();setAuthMessage('Đã khôi phục trên thiết bị. Hãy kiểm tra dữ liệu rồi đồng bộ thủ công.')}catch(e){alert('Không khôi phục được: '+e.message)}}
 function resetData(){if(confirm('Xóa toàn bộ dữ liệu FITTRACK trên thiết bị này?')){localStorage.removeItem(KEY);data=load();init()}}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function exerciseTrendData(){const all=[];Object.entries(data.workoutDays||{}).forEach(([date,entry])=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!entry||!plans[entry.plan])return;const base=plans[entry.plan].items;Object.entries(entry.exerciseNotes||{}).forEach(([key,note])=>{const match=String(note).match(/(\d+(?:[.,]\d+)?)\s*kg\b/i);if(!match)return;let name;if(key.startsWith('base-'))name=base[Number(key.slice(5))]?.[0];else if(key.startsWith('extra-'))name=(entry.extras||[]).find(x=>'extra-'+x.id===key)?.name;if(name)all.push({date,name,kg:Number(match[1].replace(',','.'))})})});return all.sort((a,b)=>a.date.localeCompare(b.date))}
