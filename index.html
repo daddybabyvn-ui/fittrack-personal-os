@@ -126,6 +126,7 @@ body.theme-dark{color-scheme:dark;--bg:#080f1e;--panel:rgba(24,36,59,.58);--pane
 .calendar-day .daydot{width:5px;height:5px;border-radius:50%;background:transparent}
 .calendar-day.logged .daydot{background:#5cbbff}.calendar-day.selected{background:#2878f0;color:#fff;border-color:#2878f0}
 .calendar-day.selected .daydot{background:#fff}.calendar-day.today:not(.selected){border-color:#70aaff}
+ .streak-week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:7px;margin-top:15px}.streak-day{background:var(--panel2);border:1px solid var(--line);border-radius:12px;text-align:center;padding:10px 2px;font-size:11px;color:var(--muted)}.streak-day.done{background:rgba(255,154,65,.14);border-color:rgba(255,154,65,.45);color:var(--white)}.streak-day strong{display:block;font-size:17px;margin-top:5px}.theme-dark .streak-day{background:rgba(110,154,220,.12)}.theme-dark .streak-day.done{background:rgba(255,154,65,.17)}
  .month-calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin:15px 0}.month-calendar .month-head{text-align:center;font-size:11px;color:var(--muted);padding:6px 0}.month-calendar button{padding:9px 1px;min-height:47px;background:var(--panel2);color:var(--white);border:1px solid var(--line);border-radius:12px;box-shadow:none;font-size:14px}.month-calendar button.selected{background:#2878f0;color:white}.month-calendar button.today{border-color:#70aaff}.month-calendar button.logged:after{content:"";display:block;width:5px;height:5px;border-radius:50%;background:#4aabff;margin:3px auto -8px}.month-calendar button.selected.logged:after{background:white}.theme-dark .month-calendar button{background:rgba(110,154,220,.12);color:#eef5ff}.theme-dark .month-calendar button.selected{background:#327fe7}.trend-chart{margin:16px 0;min-height:70px;overflow:hidden}.trend-chart svg{width:100%;height:auto;display:block}.trend-row{padding:9px 0;border-bottom:1px solid var(--line)}
 textarea{width:100%;background:#f6f8fc;color:#24344d;border:1px solid #e6eaf1;border-radius:14px;min-height:90px;padding:12px 13px;font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;resize:vertical}
 .theme-dark textarea{background:rgba(8,17,32,.48);color:#eef5ff;border-color:rgba(199,221,255,.2)}
@@ -134,7 +135,7 @@ textarea{width:100%;background:#f6f8fc;color:#24344d;border:1px solid #e6eaf1;bo
 </style>
 </head>
 <body>
-<header><div><div class="logo">FIT<span>TRACK</span></div><div class="date" id="today"></div></div><div class="header-actions"><div class="pill">v0.2.3</div><button class="theme-switch" id="themeToggle" type="button" onclick="toggleTheme()" aria-label="Chuyển giao diện sáng tối">☀️ Sáng</button></div></header>
+<header><div><div class="logo">FIT<span>TRACK</span></div><div class="date" id="today"></div></div><div class="header-actions"><div class="pill">v0.2.4</div><button class="theme-switch" id="themeToggle" type="button" onclick="toggleTheme()" aria-label="Chuyển giao diện sáng tối">☀️ Sáng</button></div></header>
 <main>
 <section class="view active" id="home">
 <h1>Hôm nay, tập trung vào mình.</h1><div class="sub">Kỷ luật nhỏ mỗi ngày. Tiến bộ theo thời gian.</div>
@@ -142,6 +143,7 @@ textarea{width:100%;background:#f6f8fc;color:#24344d;border:1px solid #e6eaf1;bo
 <div class="card"><div class="sub">NƯỚC HÔM NAY</div><div class="stat"><span id="waterNum">0</span><small style="font-size:13px;color:var(--muted)"> / 2.200 ml</small></div><div class="progress"><i id="waterBar"></i></div><button onclick="addWater(250)">+ 250 ml</button></div>
 <div class="card"><div class="sub">THÓI QUEN HOÀN THÀNH</div><div class="stat" id="habitCount">0/5</div><div class="progress"><i id="habitBar"></i></div><span class="sub">Checklist trong ngày</span></div>
 </div>
+<div class="card" id="streakCard"><div class="row"><div><div class="sub">🔥 CHUỖI NGÀY DUY TRÌ</div><div class="stat"><span id="streakDays">0</span> <small style="font-size:15px;color:var(--muted)">ngày</small></div></div><span class="pill" id="streakBest">KỶ LỤC 0 NGÀY</span></div><div class="sub" id="streakMessage">Hoàn thành ít nhất một thói quen, uống nước hoặc ghi nhật ký tập để giữ chuỗi.</div><div id="streakWeek" class="streak-week"></div><div class="sub" style="margin-top:9px">Chuỗi tính theo ngày có hoạt động; hôm nay chưa ghi nhận thì chuỗi hôm qua vẫn được giữ đến hết hôm nay.</div></div>
 <div class="card"><div class="row"><h2>Buổi tập hôm nay</h2><span class="pill" id="todayWorkoutTag">PHỤC HỒI</span></div><h3 id="todayWorkout">Ngày nghỉ / phục hồi</h3><div class="sub" id="todayWorkoutDesc">Đi bộ nhẹ, vận động thoải mái và ngủ đủ.</div><button class="secondary" style="margin-top:12px" onclick="show('workout')">Xem lịch tập</button></div>
 <div class="card"><div class="row"><h2>Thói quen hằng ngày</h2><span class="sub" id="habitSummary">0 hoàn thành</span></div><div id="homeHabits"></div></div>
 <div class="card"><h2>Ghi nhớ hôm nay</h2><div class="sub">• Ưu tiên kỹ thuật đúng khi tập.<br>• Uống nước đều trong ngày, không cố uống dồn.<br>• Ngủ khoảng 7–9 giờ nếu có thể.</div></div>
@@ -177,7 +179,7 @@ textarea{width:100%;background:#f6f8fc;color:#24344d;border:1px solid #e6eaf1;bo
 </section>
 
 <section class="view" id="settings">
-<h1>Cài đặt</h1><div class="sub">Thiết lập mục tiêu cá nhân.</div><div class="card"><div class="row"><div><h2 style="margin-bottom:5px">FITTRACK v0.2.3</h2><div class="sub">Lịch tháng và thống kê tập luyện · 18/11/2026</div></div><span class="pill" id="networkStatus">ĐANG KIỂM TRA</span></div><div class="sub">Dark Liquid Glass · Lịch tháng · Biểu đồ mức tạ · Sao lưu JSON · Đồng bộ có xác nhận khi dữ liệu khác nhau.</div><button type="button" class="secondary" style="margin-top:12px" onclick="updateAppNow()">Cập nhật ứng dụng ngay</button><div id="appUpdateStatus" class="notice" role="status" style="margin-top:8px"></div></div>
+<h1>Cài đặt</h1><div class="sub">Thiết lập mục tiêu cá nhân.</div><div class="card"><div class="row"><div><h2 style="margin-bottom:5px">FITTRACK v0.2.4</h2><div class="sub">Lịch tháng và thống kê tập luyện · 18/11/2026</div></div><span class="pill" id="networkStatus">ĐANG KIỂM TRA</span></div><div class="sub">Dark Liquid Glass · Lịch tháng · Biểu đồ mức tạ · Sao lưu JSON · Đồng bộ có xác nhận khi dữ liệu khác nhau.</div><button type="button" class="secondary" style="margin-top:12px" onclick="updateAppNow()">Cập nhật ứng dụng ngay</button><div id="appUpdateStatus" class="notice" role="status" style="margin-top:8px"></div></div>
 <div class="card"><div class="row"><h2>Tài khoản & đồng bộ</h2><span class="pill" id="authStatus">CHƯA KẾT NỐI</span></div>
 <div class="sub" id="authMessage">Kết nối Supabase để đăng ký tài khoản và đồng bộ dữ liệu giữa các thiết bị.</div>
 <label>Supabase Project URL</label><input id="sbUrl" type="url" placeholder="https://xxxxx.supabase.co">
@@ -203,7 +205,7 @@ textarea{width:100%;background:#f6f8fc;color:#24344d;border:1px solid #e6eaf1;bo
 </nav>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const APP_VERSION='0.2.3';
+const APP_VERSION='0.2.4';
 const THEME_KEY='fittrack-theme';
 function applyTheme(mode){const dark=mode==='dark';document.body.classList.toggle('theme-dark',dark);const b=document.getElementById('themeToggle');if(b){b.textContent=dark?'☀️ Sáng':'🌙 Tối';b.setAttribute('aria-label',dark?'Chuyển sang chế độ sáng':'Chuyển sang chế độ tối')}document.querySelector('meta[name="theme-color"]').setAttribute('content',dark?'#0a1427':'#f3f5f9')}
 function toggleTheme(){const next=document.body.classList.contains('theme-dark')?'light':'dark';localStorage.setItem(THEME_KEY,next);applyTheme(next)}
@@ -286,7 +288,9 @@ tue:{name:'Lower A + Core',desc:'Chân · Mông · Bụng',items:[['Leg Press','
 thu:{name:'Upper B',desc:'Độ rộng lưng · Vai sau · Tay',items:[['Assisted Pull-up / Lat Pulldown','3 × 8–12'],['Chest-Supported Row','3 × 8–12'],['Incline Dumbbell Press','3 × 8–12'],['Cable Lateral Raise','3 × 12–15'],['Reverse Pec Deck','3 × 12–15'],['Dumbbell Biceps Curl','2 × 10–15'],['Rope Triceps Pushdown','2 × 10–15']]},
 sat:{name:'Lower B + Core',desc:'Chân · Mông · Core',items:[['Hack Squat / Goblet Squat','3 × 8–12'],['Hip Thrust','3 × 10–12'],['Seated Leg Curl','3 × 10–15'],['Supported Bulgarian Split Squat','2 × 8–10 mỗi chân'],['Calf Raise','3 × 12–15'],['Hanging Knee Raise / Reverse Crunch','3 × 10–15'],['Đi bộ dốc nhẹ','10–15 phút']]}}
 const dayKey=['sun','mon','tue','wed','thu','fri','sat'][new Date().getDay()];
-function renderHome(){
+function streakActivityDates(){const days=new Set();Object.entries(data.water||{}).forEach(([date,ml])=>{if(Number(ml)>0)days.add(date)});Object.entries(data.checks||{}).forEach(([date,checks])=>{if(Array.isArray(checks)&&checks.length)days.add(date)});Object.keys(data.workoutDays||{}).forEach(date=>days.add(date));(data.sessions||[]).forEach(x=>{if(typeof x.date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(x.date))days.add(x.date)});return days}
+function renderStreak(){const active=streakActivityDates(),today=day(),start=active.has(today)?today:dateShift(today,-1);let count=0,d=start;while(active.has(d)&&count<100000){count++;d=dateShift(d,-1)}const dates=[...active].filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x)&&x<=today).sort(),set=new Set(dates);let best=0,run=0,prev=null;for(const x of dates){run=prev&&dateShift(prev,1)===x?run+1:1;best=Math.max(best,run);prev=x}document.getElementById('streakDays').textContent=count;document.getElementById('streakBest').textContent='KỶ LỤC '+best+' NGÀY';document.getElementById('streakMessage').textContent=active.has(today)?'Tuyệt vời! Anh đã duy trì hoạt động hôm nay.':'Hôm nay chưa có hoạt động. Hoàn thành một việc nhỏ để giữ chuỗi nhé!';document.getElementById('streakWeek').innerHTML=Array.from({length:7},(_,i)=>{const x=dateShift(today,i-6);return '<div class="streak-day '+(set.has(x)?'done':'')+'"><span>'+['CN','T2','T3','T4','T5','T6','T7'][parseISO(x).getDay()]+'</span><strong>'+(set.has(x)?'🔥':parseISO(x).getDate())+'</strong></div>'}).join('')}
+function renderHome(){renderStreak();
 document.getElementById('today').textContent=dayLabel();
 let w=data.water[day()]||0;document.getElementById('waterNum').textContent=w.toLocaleString('vi-VN');document.getElementById('waterBar').style.width=Math.min(100,w/data.goal*100)+'%';
 let checks=data.checks[day()]||[];document.getElementById('habitCount').textContent=checks.length+'/'+data.habits.length;document.getElementById('habitBar').style.width=(checks.length/Math.max(1,data.habits.length)*100)+'%';document.getElementById('habitSummary').textContent=checks.length+' hoàn thành';
