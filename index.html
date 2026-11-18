@@ -1262,7 +1262,7 @@ async function analyzeFitAiMeal(){
   const {data:result,error}=await sb.functions.invoke('analyze-meal',{body:{image:fitAiMealImage}});
   if(error)throw error;
   if(!Array.isArray(result?.items)||!result.items.length)throw new Error('AI chưa nhận diện được món ăn.');
-  fitAiMealItems=result.items.slice(0,12).map(x=>({name:String(x.name||'').slice(0,120),grams:Math.round(Number(x.grams)||0),kcal100:Number(x.kcal100)||0})).filter(x=>x.name&&x.grams>0&&x.kcal100>=0&&x.kcal100<=5000);
+  fitAiMealItems=result.items.slice(0,12).map(x=>({name:String(x.name||'').slice(0,120),grams:Math.round(Number(x.grams)||0),kcal100:Number(x.kcal100)||0,protein100:x.protein100==null?null:Number(x.protein100)})).filter(x=>x.name&&x.grams>0&&x.kcal100>=0&&x.kcal100<=5000);
   if(!fitAiMealItems.length)throw new Error('Không có món hợp lệ.');
   status.textContent='AI đã đề xuất '+fitAiMealItems.length+' món. Anh kiểm tra gram và calo trước khi lưu.';
   renderFitAiMealResults();
@@ -1295,7 +1295,7 @@ function saveFitAiMeal(){
  if(!/^\d{4}-\d{2}-\d{2}$/.test(date))return alert('Ngày nhật ký không hợp lệ.');
  if(fitAiMealItems.some(x=>!x.name.trim()||x.name.length>120||!Number.isFinite(x.grams)||x.grams<=0||x.grams>10000||!Number.isFinite(x.kcal100)||x.kcal100<0||x.kcal100>5000))return alert('Anh kiểm tra tên món, gram và kcal/100g trước khi lưu.');
  if(!Array.isArray(data.nutritionEntries))data.nutritionEntries=[];
- fitAiMealItems.forEach(x=>{const item={id:String(Date.now())+'-'+Math.random().toString(36).slice(2,9),date,meal,name:x.name.trim(),grams:x.grams,kcal100:x.kcal100,kcal:Math.round(x.grams*x.kcal100/100)};data.nutritionEntries.push(item);rememberFitFood(item)});
+ fitAiMealItems.forEach(x=>{const item={id:String(Date.now())+'-'+Math.random().toString(36).slice(2,9),date,meal,name:x.name.trim(),grams:x.grams,kcal100:x.kcal100,protein100:x.protein100??null,kcal:Math.round(x.grams*x.kcal100/100)};data.nutritionEntries.push(item);rememberFitFood(item)});
  save();fitAiMealItems=[];document.getElementById('fitAiResults').innerHTML='';document.getElementById('fitAiStatus').textContent='✓ Đã lưu từng món vào nhật ký. Anh có thể sửa hoặc xóa từng món bên dưới.';renderNutrition();
 }
 function fitSavedFoods(){
