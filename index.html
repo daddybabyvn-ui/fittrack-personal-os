@@ -134,7 +134,7 @@ textarea{width:100%;background:#f6f8fc;color:#24344d;border:1px solid #e6eaf1;bo
 </style>
 </head>
 <body>
-<header><div><div class="logo">FIT<span>TRACK</span></div><div class="date" id="today"></div></div><div class="header-actions"><div class="pill">v0.2.2</div><button class="theme-switch" id="themeToggle" type="button" onclick="toggleTheme()" aria-label="Chuyển giao diện sáng tối">☀️ Sáng</button></div></header>
+<header><div><div class="logo">FIT<span>TRACK</span></div><div class="date" id="today"></div></div><div class="header-actions"><div class="pill">v0.2.3</div><button class="theme-switch" id="themeToggle" type="button" onclick="toggleTheme()" aria-label="Chuyển giao diện sáng tối">☀️ Sáng</button></div></header>
 <main>
 <section class="view active" id="home">
 <h1>Hôm nay, tập trung vào mình.</h1><div class="sub">Kỷ luật nhỏ mỗi ngày. Tiến bộ theo thời gian.</div>
@@ -168,16 +168,16 @@ textarea{width:100%;background:#f6f8fc;color:#24344d;border:1px solid #e6eaf1;bo
 <section class="view" id="progress">
 <h1>Body progress</h1><div class="sub">Theo dõi thay đổi bằng dữ liệu, không chỉ bằng cảm giác.</div>
 <div class="card"><h2>Ghi nhận chỉ số</h2>
-<label>Cân nặng (kg)</label><input id="weight" type="number" step=".1" placeholder="Ví dụ: 63">
-<label>Vòng eo (cm)</label><input id="waist" type="number" step=".5" placeholder="Ví dụ: 76">
+<label>Chiều cao (cm)</label><input id="heightCm" type="number" min="100" max="230" step=".1" placeholder="Ví dụ: 170" oninput="previewBodyMetrics()"><label>Cân nặng (kg)</label><input id="weight" type="number" step=".1" oninput="previewBodyMetrics()" placeholder="Ví dụ: 63">
+<label>Vòng eo (cm)</label><input id="waist" type="number" step=".5" oninput="previewBodyMetrics()" placeholder="Ví dụ: 76">
 <label>Ghi chú</label><input id="bodyNote" placeholder="Cảm nhận / ảnh tiến độ...">
-<button onclick="saveBody()">Lưu chỉ số</button></div>
+<div id="bodyMetricsPreview" class="card" style="margin:8px 0;background:var(--panel2)"><div class="sub">Nhập chiều cao và cân nặng để xem BMI; thêm vòng eo để xem tỷ lệ eo/chiều cao.</div></div><button onclick="saveBody()">Lưu chỉ số</button></div>
 <div class="card"><h2>Lịch sử gần đây</h2><div id="bodyHistory" class="sub">Chưa có dữ liệu. Hãy thêm lần ghi nhận đầu tiên.</div></div>
 <div class="card"><h2>Tiến bộ mức tạ theo bài tập</h2><div class="sub">Biểu đồ lấy mức tạ đầu tiên có đơn vị kg trong nhật ký của từng bài. Các ghi chú không có kg sẽ không được tính.</div><label>Chọn bài tập</label><select id="exerciseTrendSelect" onchange="renderExerciseTrend()"></select><div id="exerciseTrendChart" class="trend-chart"></div><div id="exerciseTrendHistory" class="sub"></div></div><div class="card"><h2>Thống kê tập luyện</h2><div class="stat" id="sessionCount">0</div><div class="sub">Buổi tập đã lưu trên thiết bị này</div></div>
 </section>
 
 <section class="view" id="settings">
-<h1>Cài đặt</h1><div class="sub">Thiết lập mục tiêu cá nhân.</div><div class="card"><div class="row"><div><h2 style="margin-bottom:5px">FITTRACK v0.2.2</h2><div class="sub">Lịch tháng và thống kê tập luyện · 18/11/2026</div></div><span class="pill" id="networkStatus">ĐANG KIỂM TRA</span></div><div class="sub">Dark Liquid Glass · Lịch tháng · Biểu đồ mức tạ · Sao lưu JSON · Đồng bộ có xác nhận khi dữ liệu khác nhau.</div><button type="button" class="secondary" style="margin-top:12px" onclick="updateAppNow()">Cập nhật ứng dụng ngay</button><div id="appUpdateStatus" class="notice" role="status" style="margin-top:8px"></div></div>
+<h1>Cài đặt</h1><div class="sub">Thiết lập mục tiêu cá nhân.</div><div class="card"><div class="row"><div><h2 style="margin-bottom:5px">FITTRACK v0.2.3</h2><div class="sub">Lịch tháng và thống kê tập luyện · 18/11/2026</div></div><span class="pill" id="networkStatus">ĐANG KIỂM TRA</span></div><div class="sub">Dark Liquid Glass · Lịch tháng · Biểu đồ mức tạ · Sao lưu JSON · Đồng bộ có xác nhận khi dữ liệu khác nhau.</div><button type="button" class="secondary" style="margin-top:12px" onclick="updateAppNow()">Cập nhật ứng dụng ngay</button><div id="appUpdateStatus" class="notice" role="status" style="margin-top:8px"></div></div>
 <div class="card"><div class="row"><h2>Tài khoản & đồng bộ</h2><span class="pill" id="authStatus">CHƯA KẾT NỐI</span></div>
 <div class="sub" id="authMessage">Kết nối Supabase để đăng ký tài khoản và đồng bộ dữ liệu giữa các thiết bị.</div>
 <label>Supabase Project URL</label><input id="sbUrl" type="url" placeholder="https://xxxxx.supabase.co">
@@ -203,7 +203,7 @@ textarea{width:100%;background:#f6f8fc;color:#24344d;border:1px solid #e6eaf1;bo
 </nav>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const APP_VERSION='0.2.2';
+const APP_VERSION='0.2.3';
 const THEME_KEY='fittrack-theme';
 function applyTheme(mode){const dark=mode==='dark';document.body.classList.toggle('theme-dark',dark);const b=document.getElementById('themeToggle');if(b){b.textContent=dark?'☀️ Sáng':'🌙 Tối';b.setAttribute('aria-label',dark?'Chuyển sang chế độ sáng':'Chuyển sang chế độ tối')}document.querySelector('meta[name="theme-color"]').setAttribute('content',dark?'#0a1427':'#f3f5f9')}
 function toggleTheme(){const next=document.body.classList.contains('theme-dark')?'light':'dark';localStorage.setItem(THEME_KEY,next);applyTheme(next)}
@@ -382,8 +382,29 @@ function saveWorkout(){
  document.getElementById('selectedWorkoutStatus').textContent='ĐÃ LƯU';
  document.getElementById('workoutSaved').textContent='Đã lưu lịch và nhật ký cho ngày '+selectedWorkoutDay.split('-').reverse().join('/')+'.';
 }
-function saveBody(){let weight=Number(document.getElementById('weight').value),waist=Number(document.getElementById('waist').value),note=document.getElementById('bodyNote').value;if(!weight&&!waist){alert('Nhập ít nhất cân nặng hoặc vòng eo nhé.');return}data.body.unshift({date:day(),weight:weight||null,waist:waist||null,note});save();document.getElementById('weight').value='';document.getElementById('waist').value='';document.getElementById('bodyNote').value='';renderBody()}
-function renderBody(){document.getElementById('sessionCount').textContent=data.sessions.length;document.getElementById('bodyHistory').innerHTML=data.body.length?'<table><tr><th>Ngày</th><th>Cân nặng</th><th>Vòng eo</th></tr>'+data.body.slice(0,12).map(x=>`<tr><td>${x.date}</td><td>${x.weight??'—'} kg</td><td>${x.waist??'—'} cm</td></tr>`).join('')+'</table>':'Chưa có dữ liệu. Hãy thêm lần ghi nhận đầu tiên.'}
+function latestHeight(){return data.body.find(x=>Number(x.heightCm)>0)?.heightCm||null}
+function bodyMetricInfo(weight,waist,height){
+ const bmi=weight&&height?weight/((height/100)**2):null;
+ const whtr=waist&&height?waist/height:null;
+ let bmiLabel=bmi==null?'Chưa đủ dữ liệu':bmi<18.5?'Dưới ngưỡng tham khảo':bmi<25?'Trong ngưỡng tham khảo':bmi<30?'Cao hơn ngưỡng tham khảo':'Cao đáng kể so với ngưỡng tham khảo';
+ let whtrLabel=whtr==null?'Chưa đủ dữ liệu':whtr<.4?'Tỷ lệ thấp, nên xem xét thêm bối cảnh':whtr<.5?'Dưới ngưỡng 0,5':whtr<.6?'Từ 0,5 đến dưới 0,6': 'Từ 0,6 trở lên';
+ return {bmi,whtr,bmiLabel,whtrLabel}
+}
+function previewBodyMetrics(){
+ const height=Number(document.getElementById('heightCm').value)||Number(latestHeight())||0,weight=Number(document.getElementById('weight').value),waist=Number(document.getElementById('waist').value);
+ const box=document.getElementById('bodyMetricsPreview'),v=bodyMetricInfo(weight,waist,height);
+ box.innerHTML='<strong>Đánh giá tham khảo</strong><div class="sub" style="margin-top:8px">Chiều cao sử dụng: '+(height?height+' cm':'chưa có')+'</div><div class="sub" style="margin-top:8px">BMI: <b>'+(v.bmi?v.bmi.toFixed(1):'—')+'</b> · '+v.bmiLabel+'</div><div class="sub" style="margin-top:8px">Eo/chiều cao: <b>'+(v.whtr?v.whtr.toFixed(2):'—')+'</b> · '+v.whtrLabel+'</div><div class="notice" style="margin-top:9px">Chỉ áp dụng tham khảo cho người trưởng thành. BMI không đo lượng mỡ/cơ. Tỷ lệ eo/chiều cao là chỉ báo sàng lọc, không phải chẩn đoán.</div>';
+}
+function saveBody(){
+ const heightInput=document.getElementById('heightCm').value.trim(),weightInput=document.getElementById('weight').value.trim(),waistInput=document.getElementById('waist').value.trim();
+ const height=heightInput?Number(heightInput):Number(latestHeight())||null,weight=weightInput?Number(weightInput):null,waist=waistInput?Number(waistInput):null,note=document.getElementById('bodyNote').value;
+ if(!heightInput&&!weightInput&&!waistInput){alert('Nhập ít nhất một chỉ số nhé anh.');return}
+ if((heightInput&&(!Number.isFinite(height)||height<100||height>230))||(weightInput&&(!Number.isFinite(weight)||weight<20||weight>400))||(waistInput&&(!Number.isFinite(waist)||waist<30||waist>250))){alert('Chỉ số chưa hợp lệ. Kiểm tra chiều cao (100–230 cm), cân nặng (20–400 kg), vòng eo (30–250 cm).');return}
+ data.body.unshift({date:day(),heightCm:height,weight,waist,note});save();
+ document.getElementById('weight').value='';document.getElementById('waist').value='';document.getElementById('bodyNote').value='';renderBody();
+}
+
+function renderBody(){document.getElementById('sessionCount').textContent=data.sessions.length;const height=document.getElementById('heightCm');if(height&&document.activeElement!==height)height.value=latestHeight()||'';previewBodyMetrics();document.getElementById('bodyHistory').innerHTML=data.body.length?'<div style="overflow-x:auto"><table><tr><th>Ngày</th><th>Chiều cao</th><th>Cân nặng</th><th>Vòng eo</th><th>BMI</th><th>Eo/chiều cao</th></tr>'+data.body.slice(0,12).map(x=>{const m=bodyMetricInfo(Number(x.weight),Number(x.waist),Number(x.heightCm)||Number(latestHeight()));return '<tr><td>'+esc(x.date)+'</td><td>'+(x.heightCm??'—')+' cm</td><td>'+(x.weight??'—')+' kg</td><td>'+(x.waist??'—')+' cm</td><td>'+(m.bmi?m.bmi.toFixed(1):'—')+'</td><td>'+(m.whtr?m.whtr.toFixed(2):'—')+'</td></tr>'}).join('')+'</table></div>':'Chưa có dữ liệu. Hãy thêm lần ghi nhận đầu tiên.'}
 function saveGoal(){let g=Number(document.getElementById('waterGoal').value);if(g<500||g>6000){alert('Hãy nhập mục tiêu từ 500 đến 6.000 ml.');return}data.goal=g;save();renderHome();alert('Đã lưu mục tiêu nước.')}
 function exportData(){
   const backup={format:'fittrack-backup',version:1,exportedAt:new Date().toISOString(),data:JSON.parse(JSON.stringify(data))};
