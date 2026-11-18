@@ -48,6 +48,52 @@ table{width:100%;border-collapse:collapse;font-size:13px}td,th{text-align:left;p
 }
 @media(min-width:1200px){main{padding:34px 48px}.grid{gap:18px}.card{padding:22px}}
 @media(max-width:420px){.grid{grid-template-columns:1fr}.card{padding:14px}h1{font-size:24px}.tabs button{font-size:10px}}
+
+/* FITTRACK iOS-inspired visual refresh */
+:root{color-scheme:light;--bg:#f3f5f9;--panel:#fff;--panel2:#edf1f7;--line:#e5eaf1;--muted:#798397;--white:#17233a;--accent:#2563eb;--danger:#e44c60}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{background:linear-gradient(180deg,#e9f2ff 0,#f4f6fa 240px,#f4f6fa 100%);color:var(--white);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",sans-serif;letter-spacing:-.012em;padding-bottom:calc(100px + env(safe-area-inset-bottom))}
+header{background:rgba(246,249,253,.76);border-bottom:1px solid rgba(255,255,255,.7);backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);padding:calc(16px + env(safe-area-inset-top)) 20px 15px;box-shadow:0 3px 24px rgba(44,72,112,.035)}
+.logo{font-size:19px;font-weight:850;letter-spacing:-.8px}.logo span{color:#2873ee}.date{font-size:12px;color:#8894a6}
+header>.pill{background:#e6efff;color:#2365d6;border:0;font-weight:750;letter-spacing:.05em}
+main{padding:19px 16px;max-width:1120px}.view{animation:iosAppear .25s ease both}
+@keyframes iosAppear{from{opacity:.45;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+h1{font-size:clamp(27px,5vw,37px);letter-spacing:-1.1px;line-height:1.14;font-weight:800;margin:12px 2px 8px}
+h2{font-size:18px;letter-spacing:-.4px;font-weight:760;margin-bottom:14px}h3{font-size:16px;letter-spacing:-.3px}
+.sub{color:#7c889b;font-size:13px;line-height:1.55}
+.card{background:rgba(255,255,255,.96);border:1px solid rgba(228,234,242,.9);border-radius:24px;padding:19px;margin:15px 0;box-shadow:0 9px 28px rgba(35,67,113,.055),0 1px 3px rgba(35,67,113,.025)}
+.grid{gap:12px}.grid>.card{margin:12px 0;min-width:0}
+.stat{font-size:30px;letter-spacing:-1.2px;font-weight:800;color:#1e3356}
+.accent{color:#2563eb}.pill{background:#eaf2ff;color:#2b6ee5;border:1px solid #dbe9ff;border-radius:999px;font-size:10px;font-weight:800;padding:6px 10px;white-space:nowrap}
+button,.btn{background:#2878f0;color:#fff;border-radius:14px;min-height:43px;padding:11px 15px;font-size:13px;font-weight:720;box-shadow:0 4px 10px rgba(42,115,227,.13);transition:transform .16s,background .16s}
+button.secondary{background:#eef4ff;color:#2466c8;border:1px solid #e0eafb;box-shadow:none}
+button.ghost{background:#f6f7fa;color:#7b8595;border:1px solid #e9edf3;box-shadow:none}
+button:active{transform:scale(.965)}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #a4c8ff;outline-offset:2px}
+input,select{background:#f6f8fc;color:#24344d;border:1px solid #e6eaf1;border-radius:14px;min-height:45px;padding:12px 13px;font-size:16px;margin:7px 0 12px}
+input::placeholder{color:#a4adba}label{font-size:12px;font-weight:650;color:#7c899b}
+.progress{background:#e9eef7;height:9px;border-radius:999px;margin:13px 0}.progress i{background:linear-gradient(90deg,#64a7ff,#2777ef);border-radius:999px}
+.habit{padding:14px 0;border-bottom:1px solid #eef1f6}.habit input{width:21px;height:21px;accent-color:#2878f0}
+.exercise{padding:15px 0;border-bottom:1px solid #edf0f5}.exercise small{color:#8793a4}
+.tabs{left:12px;right:12px;bottom:calc(9px + env(safe-area-inset-bottom));padding:7px 5px;gap:3px;border:1px solid rgba(230,235,243,.92);border-radius:24px;background:rgba(255,255,255,.91);box-shadow:0 8px 35px rgba(31,61,101,.14);backdrop-filter:blur(26px) saturate(170%);-webkit-backdrop-filter:blur(26px) saturate(170%);justify-content:space-between}
+.tabs button{color:#8d99aa;border-radius:17px;padding:8px 2px 7px;font-size:10px;min-height:54px;box-shadow:none;font-weight:650}
+.tabs button.active{color:#236de6;background:#eaf2ff}
+.tabs b{font-size:23px;line-height:25px;font-weight:700;margin-bottom:3px}
+table{font-size:13px}td,th{border-bottom:1px solid #edf0f6}th{color:#8995a6}
+.notice{color:#7c889b}
+@media(min-width:760px){
+body{padding-left:236px;padding-bottom:30px}
+header{padding:24px 36px 20px}
+main{padding:28px 36px;max-width:1350px}
+.tabs{top:18px;bottom:18px;left:14px;right:auto;width:208px;padding:104px 10px 16px;border-radius:25px;flex-direction:column;justify-content:flex-start;gap:7px;background:rgba(255,255,255,.88);border:1px solid #e6ebf2;box-shadow:0 8px 30px rgba(30,63,111,.06)}
+.tabs button{display:flex;align-items:center;gap:13px;flex:none;text-align:left;font-size:14px;padding:12px 13px;min-height:48px}
+.tabs b{display:inline-block;font-size:22px;width:27px;text-align:center;margin:0}
+.grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.card{padding:23px;border-radius:25px;margin:18px 0}
+h1{margin-top:12px}
+}
+@media(max-width:420px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.grid>.card{padding:13px}.grid>.card .stat{font-size:24px}.grid>.card button{padding:9px;font-size:12px;min-height:38px}.card{padding:17px}h1{font-size:28px}.tabs button{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.view{animation:none}*{scroll-behavior:auto}}
+
 </style>
 </head>
 <body>
