@@ -18,7 +18,7 @@ Deno.serve(async (req) => {
   if(typeof image!=='string'||!/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(image)||image.length>2500000)return respond({error:'Invalid or oversized image'},400);
   const key=Deno.env.get('GEMINI_API_KEY');
   if(!key)return respond({error:'Gemini service not configured'},503);
-  const prompt='Analyze this photo of a meal. Return ONLY a JSON object with items array, each item having name (Vietnamese food name), grams (estimated cooked edible grams), kcal100 (estimated kcal per 100g). Up to 12 separate foods. Include visible sauces and oil when possible. Be conservative, never claim precision. If no food return {"items":[]}. Example: {"items":[{"name":"Cơm trắng","grams":150,"kcal100":130}]}';
+  const prompt='Analyze this photo of a meal. Return ONLY a JSON object with items array, each item having name (Vietnamese food name), grams (estimated cooked edible grams), kcal100 (estimated kcal per 100g), protein100 (estimated grams of protein per 100g; null if unknown). Up to 12 separate foods. Include visible sauces and oil when possible. Be conservative, never claim precision. If no food return {"items":[]}. Example: {"items":[{"name":"Cơm trắng","grams":150,"kcal100":130,"protein100":2.7}]}';
   // Discover the models actually available to this Gemini API key.
   // A fixed model name may return 404 even when the key is valid.
   const available=await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=100',{
@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
    break;
   }
   if(!result)return respond({error:'Gemini request failed: '+lastError},502);
-  const items=Array.isArray(result.items)?result.items.slice(0,12).map((x:Record<string,unknown>)=>({name:String(x.name||'').slice(0,120),grams:Math.round(Number(x.grams)||0),kcal100:Math.round((Number(x.kcal100)||0)*10)/10})).filter((x:{name:string,grams:number,kcal100:number})=>x.name&&x.grams>0&&x.grams<=10000&&x.kcal100>=0&&x.kcal100<=1000):[];
+  const items=Array.isArray(result.items)?result.items.slice(0,12).map((x:Record<string,unknown>)=>({name:String(x.name||'').slice(0,120),grams:Math.round(Number(x.grams)||0),kcal100:Math.round((Number(x.kcal100)||0)*10)/10,protein100:x.protein100==null?null:Math.round(Number(x.protein100)*10)/10})).filter((x:{name:string,grams:number,kcal100:number})=>x.name&&x.grams>0&&x.grams<=10000&&x.kcal100>=0&&x.kcal100<=5000):[];
   return respond({items,notice:'Ước tính từ ảnh, cần xác nhận khối lượng và cách chế biến trước khi lưu.'});
  }catch{return respond({error:'Could not analyze image'},500)}
 });
